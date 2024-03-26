@@ -1,9 +1,12 @@
+#include <QLayout>
+#include "plotter.h"
+#include <QListWidget>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include <QListWidget>
 #include <QStandardItemModel>
 
 QStandardItemModel *model = nullptr;
+Plotter* plotter;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
     model->appendRow(item);
 
     ui->listView->setModel(model);
+
+    plotter = new Plotter(ui->widget);
 }
 
 MainWindow::~MainWindow()
@@ -33,4 +38,5 @@ MainWindow::~MainWindow()
         delete model->item(i);
     }
     delete model;
+    delete plotter;
 }

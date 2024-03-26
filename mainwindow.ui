@@ -1205,7 +1205,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Радианы</string>
+      <string>Radians</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="degreeRadioButton">
@@ -1230,7 +1230,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Градусы</string>
+      <string>Degrees</string>
      </property>
     </widget>
    </widget>
@@ -1337,24 +1337,25 @@
      <rect>
       <x>218</x>
       <y>30</y>
-      <width>721</width>
+      <width>720</width>
       <height>520</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>0</width>
+      <width>720</width>
       <height>520</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>1000</width>
+      <width>720</width>
       <height>520</height>
      </size>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: white; border: 1px solid black</string>
+     <string notr="true">background-color: white; 
+border: 1px solid black; </string>
     </property>
    </widget>
   </widget>
