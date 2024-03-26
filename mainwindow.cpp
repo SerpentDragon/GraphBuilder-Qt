@@ -6,7 +6,7 @@
 #include <QStandardItemModel>
 
 QStandardItemModel *model = nullptr;
-Plotter* plotter;
+Plotter* plotter = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
