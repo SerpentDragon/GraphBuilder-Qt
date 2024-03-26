@@ -5,7 +5,7 @@
 #include "./ui_mainwindow.h"
 #include <QStandardItemModel>
 
-QStandardItemModel *model = nullptr;
+QStandardItemModel* model = nullptr;
 Plotter* plotter = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->listView->setModel(model);
 
-    plotter = new Plotter(ui->widget);
+    plotter = new Plotter(ui->widget, 60);
 }
 
 MainWindow::~MainWindow()
