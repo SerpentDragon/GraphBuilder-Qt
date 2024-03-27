@@ -130,7 +130,7 @@ double ParseTree::EvalTree(Node* node, double x)
         else if (node->data == "ln") return log(left);
         else if (node->data == "lg") return log10(left);
         else if (node->data == "log") return log(right) / log(left);
-        else if (node->data == "abs") return abs(left);
+        else if (node->data == "abs") return fabs(left);
         else if (node->data == "sqrt") return sqrt(left);
         else return 0;
     }
