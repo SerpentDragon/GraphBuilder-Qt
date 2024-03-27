@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->listView->setModel(model);
 
-    plotter = new Plotter(ui->widget, WidgetParams::Plotter::defaultSegmentSize);
+    plotter = new Plotter(ui->widget, 60);
 }
 
 MainWindow::~MainWindow()
