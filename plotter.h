@@ -4,11 +4,15 @@
 #include <QWidget>
 #include <QLayout>
 #include <QPainter>
+#include "settings.h"
+#include <QMouseEvent>
+
+namespace pl = WidgetParams::Plotter;
 
 class Plotter : public QWidget
 {
 public:
-    Plotter(QWidget* parent = nullptr, int segmentSize = 0) : QWidget(parent)
+    Plotter(QWidget* parent = nullptr, double segmentSize = 0) : QWidget(parent)
     {
         if (parent != nullptr)
         {
@@ -45,12 +49,64 @@ protected:
 
     void mousePressEvent(QMouseEvent* event) override
     {
+        if (event->button() == Qt::LeftButton)
+        {
+            mouseStart_.x = event->pos().x();
+            mouseStart_.y = event->pos().y();
+        }
+
         QWidget::mousePressEvent(event);
+    }
+
+    void mouseMoveEvent(QMouseEvent* event) override
+    {
+        if (event->buttons() & Qt::LeftButton)
+        {
+            mouseEnd_.x = event->pos().x();
+            mouseEnd_.y = event->pos().y();
+
+            int dx = mouseEnd_.x - mouseStart_.x;
+            int dy = mouseEnd_.y - mouseStart_.y;
+
+            center_.x += dx;
+            center_.y += dy;
+
+            mouseStart_ = mouseEnd_;
+
+            update();
+        }
+
+        QWidget::mouseMoveEvent(event);
     }
 
     void mouseReleaseEvent(QMouseEvent* event) override
     {
+        if (event->button() == Qt::LeftButton)
+        {
+            mouseStart_.x = mouseStart_.y = 0;
+        }
+
         QWidget::mouseReleaseEvent(event);
+    }
+
+    void wheelEvent(QWheelEvent* event) override
+    {
+        int angle = event->angleDelta().y();
+
+        if (angle > 0)
+        {
+            if (segmentSize_ < pl::maxZoom)
+                segmentSize_ *= pl::zoomCoefficient;
+        }
+        else
+        {
+            if (segmentSize_ > pl::minZoom)
+                segmentSize_ /= pl::zoomCoefficient;
+        }
+
+        QWidget::wheelEvent(event);
+
+        update();
     }
 
 private:
@@ -93,7 +149,7 @@ private:
     {
         int x;
         int y;
-    } center_;
+    } center_, mouseStart_, mouseEnd_;
 
     int width_;
     int height_;
@@ -102,7 +158,7 @@ private:
     double auxiliaryAxisWidth_;
     double graphLineWidth_;
 
-    int segmentSize_;
+    double segmentSize_;
 
     QColor mainAxisColor_;
     QColor auxiliaryAxisColor_;
