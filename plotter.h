@@ -43,7 +43,7 @@ public:
             maxZoom_ = 1920;
             minZoom_ = 2;
             zoomCoefficient_ = 2;
-            numbersFactor_ = 1;
+            coordinatesFactor_ = 1;
 
             mainAxisColor_ = Qt::black;
             auxiliaryAxisColor_ = QColor::fromRgb(100, 100, 100);
@@ -118,7 +118,7 @@ protected:
             if (segmentSize_ > maxSegmentSize_)
             {
                 segmentSize_ = minSegmentSize_;
-                numbersFactor_ /= zoomCoefficient_;
+                coordinatesFactor_ /= zoomCoefficient_;
             }
         }
         else
@@ -127,7 +127,7 @@ protected:
             if (segmentSize_ < minSegmentSize_)
             {
                 segmentSize_ = maxSegmentSize_;
-                numbersFactor_ *= zoomCoefficient_;
+                coordinatesFactor_ *= zoomCoefficient_;
             }
         }
 
@@ -148,71 +148,133 @@ private:
     void paintAuxiliaryAxes(QPainter& painter)
     {
         painter.setPen(QPen{ auxiliaryAxisColor_, auxiliaryAxisWidth_ });
-        painter.setBrush(QBrush{ Qt::black });
 
-        int counter = 0;
-        for(int x = center_.x - segmentSize_; x > 0; x -= segmentSize_)
-        {
-            painter.drawLine(x, 0, x, height_);
-            painter.drawText(x + 2, center_.y + 15, QString::number(--counter * numbersFactor_));
-        }
+        // int counter = 0;
+        // for(int x = center_.x - segmentSize_; x > 0; x -= segmentSize_)
+        // {
+        //     painter.drawLine(x, 0, x, height_);
+        //     painter.drawText(x + 2, center_.y + 15, QString::number(--counter * numbersFactor_));
+        // }
 
-        counter = 0;
-        for(int x = center_.x + segmentSize_; x < width_; x += segmentSize_)
-        {
-            painter.drawLine(x, 0, x, height_);
-            painter.drawText(x - 2, center_.y + 15, QString::number(++counter * numbersFactor_));
-        }
+        // counter = 0;
+        // for(int x = center_.x + segmentSize_; x < width_; x += segmentSize_)
+        // {
+        //     painter.drawLine(x, 0, x, height_);
+        //     painter.drawText(x - 2, center_.y + 15, QString::number(++counter * numbersFactor_));
+        // }
 
-        counter = 0;
-        for(int y = center_.y - segmentSize_; y > 0; y -= segmentSize_)
-        {
-            painter.drawLine(0, y, width_, y);
-            painter.drawText(center_.x, y - 2, QString::number(++counter * numbersFactor_));
-        }
+        // counter = 0;
+        // for(int y = center_.y - segmentSize_; y > 0; y -= segmentSize_)
+        // {
+        //     painter.drawLine(0, y, width_, y);
+        //     painter.drawText(center_.x, y - 2, QString::number(++counter * numbersFactor_));
+        // }
 
-        counter = 0;
-        for(int y = center_.y + segmentSize_; y < width_; y += segmentSize_)
-        {
-            painter.drawLine(0, y, width_, y);
-            painter.drawText(center_.x, y - 2, QString::number(++counter * numbersFactor_));
-        }
+        // counter = 0;
+        // for(int y = center_.y + segmentSize_; y < width_; y += segmentSize_)
+        // {
+        //     painter.drawLine(0, y, width_, y);
+        //     painter.drawText(center_.x, y - 2, QString::number(--counter * numbersFactor_));
+        // }
+
+        paintCoordinateLines(painter, segmentSize_);
     }
 
     void paintAdditionalAxes(QPainter& painter)
     {
         painter.setPen(QPen{ additionalAxisColor_, additionalAxisWidth_ });
 
-        double step = segmentSize_ / 5;
-        double x, y;
+        paintCoordinateLines(painter, segmentSize_ / 5);
+    }
 
+    void paintCoordinateLines(QPainter& painter, double step)
+    {
+
+        int counter;
+        double x, y;
+        double penWidth = painter.pen().widthF();
+
+        counter = 0;
         x = center_.x - step;
         while (x > 0)
         {
             painter.drawLine(x, 0, x, height_);
+            if (penWidth == auxiliaryAxisWidth_)
+            {
+                counter--;
+                drawCoordinateText(painter, counter, x, true);
+            }
+
             x -= step;
         }
 
+        counter = 0;
         x = center_.x + step;
         while (x < width_)
         {
             painter.drawLine(x, 0, x, height_);
+            if (penWidth == auxiliaryAxisWidth_)
+            {
+                counter++;
+                drawCoordinateText(painter, counter, x, true);
+            }
             x += step;
         }
 
+        counter = 0;
         y = center_.y - step;
         while (y > 0)
         {
             painter.drawLine(0, y, width_, y);
+            if (penWidth == auxiliaryAxisWidth_)
+            {
+                counter--;
+                drawCoordinateText(painter, counter, y, false);
+            }
             y -= step;
         }
 
+        counter = 0;
         y = center_.y + step;
         while (y < height_)
         {
             painter.drawLine(0, y, width_, y);
+            if (penWidth == auxiliaryAxisWidth_)
+            {
+                counter++;
+                drawCoordinateText(painter, counter, y, false);
+            }
             y += step;
         }
+    }
+
+    void drawCoordinateText(QPainter& painter, int counter, double coord, bool horizontal)
+    {
+        QPen prevPen = painter.pen();
+        painter.setPen(Qt::black);
+
+        QString number = QString::number(counter * coordinatesFactor_);
+        QRect boundingRect = painter.fontMetrics().boundingRect(number);
+
+        horizontal ?
+            painter.drawText(coord - boundingRect.width() / 2, calculateY(boundingRect), number)
+            : painter.drawText(calculateX(boundingRect), coord + boundingRect.height() / 3, number);
+
+        painter.setPen(prevPen);
+    }
+
+    double calculateX(const QRect& boundingRect)
+    {
+        if (center_.x > width_) return width_ - boundingRect.width() - 2;
+        else if (center_.x < 0) return 0;
+        else return center_.x + 2;
+    }
+
+    double calculateY(const QRect& boundingRect)
+    {
+        if (center_.y > height_) return height_;
+        else if (center_.y < 0) return boundingRect.height();
+        else return center_.y - 2;
     }
 
 private:
@@ -239,7 +301,7 @@ private:
     double maxZoom_;
     double minZoom_;
     double zoomCoefficient_;
-    double numbersFactor_;
+    double coordinatesFactor_;
 
     QColor mainAxisColor_;
     QColor auxiliaryAxisColor_;
