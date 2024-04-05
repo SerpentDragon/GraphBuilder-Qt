@@ -6,17 +6,6 @@
 #include <QPainter>
 #include <QMouseEvent>
 
-// Point mouseStart_, mouseEnd_;
-
-// double diffminSegmentSize_;
-
-// double maxZoom_;
-// double minZoom_;
-// // double zoomCoefficient_ = 2;
-
-// QColor mainAxisColor_;
-// QColor auxiliaryAxisColor_;
-
 class Plotter : public QWidget
 {
 public:
@@ -35,15 +24,15 @@ public:
             additionalAxisWidth_ = 0.25;
             graphLineWidth_ = 2.5;
 
-            segmentSize_ = segmentSize;
-            minSegmentSize_ = segmentSize;
-            maxSegmentSize_ = 4 * minSegmentSize_;
-            diffminSegmentSize_ = 3 * minSegmentSize_ / 30;
-
             maxZoom_ = 1920;
             minZoom_ = 2;
             zoomCoefficient_ = 2;
             coordinatesFactor_ = 1;
+
+            segmentSize_ = segmentSize;
+            minSegmentSize_ = segmentSize;
+            maxSegmentSize_ = 2 * zoomCoefficient_ * minSegmentSize_;
+            diffSegmentSize_ = minSegmentSize_ * 0.1;
 
             mainAxisColor_ = Qt::black;
             auxiliaryAxisColor_ = QColor::fromRgb(100, 100, 100);
@@ -112,24 +101,48 @@ protected:
     {
         int angle = event->angleDelta().y();
 
+        QPointF cursorPos = event->position();
+
+        double dx = cursorPos.x() - center_.x;
+        double dy = cursorPos.y() - center_.y;
+
         if (angle > 0)
         {
-            segmentSize_ += diffminSegmentSize_;
+            segmentSize_ += diffSegmentSize_;
             if (segmentSize_ > maxSegmentSize_)
             {
                 segmentSize_ = minSegmentSize_;
                 coordinatesFactor_ /= zoomCoefficient_;
+
+                dx /= (zoomCoefficient_);
+                dy /= (zoomCoefficient_);
+            }
+            else
+            {
+                dx -= dx / (segmentSize_ - diffSegmentSize_) * segmentSize_;
+                dy -= dy / (segmentSize_ - diffSegmentSize_) * segmentSize_;
             }
         }
         else
         {
-            segmentSize_ -= diffminSegmentSize_;
+            segmentSize_ -= diffSegmentSize_;
             if (segmentSize_ < minSegmentSize_)
             {
                 segmentSize_ = maxSegmentSize_;
                 coordinatesFactor_ *= zoomCoefficient_;
+
+                dx *= (1 - zoomCoefficient_);
+                dy *= (1 - zoomCoefficient_);
+            }
+            else
+            {
+                dx -= dx / (segmentSize_ + diffSegmentSize_) * segmentSize_;
+                dy -= dy / (segmentSize_ + diffSegmentSize_) * segmentSize_;
             }
         }
+
+        center_.x += dx;
+        center_.y += dy;
 
         QWidget::wheelEvent(event);
 
@@ -149,34 +162,6 @@ private:
     {
         painter.setPen(QPen{ auxiliaryAxisColor_, auxiliaryAxisWidth_ });
 
-        // int counter = 0;
-        // for(int x = center_.x - segmentSize_; x > 0; x -= segmentSize_)
-        // {
-        //     painter.drawLine(x, 0, x, height_);
-        //     painter.drawText(x + 2, center_.y + 15, QString::number(--counter * numbersFactor_));
-        // }
-
-        // counter = 0;
-        // for(int x = center_.x + segmentSize_; x < width_; x += segmentSize_)
-        // {
-        //     painter.drawLine(x, 0, x, height_);
-        //     painter.drawText(x - 2, center_.y + 15, QString::number(++counter * numbersFactor_));
-        // }
-
-        // counter = 0;
-        // for(int y = center_.y - segmentSize_; y > 0; y -= segmentSize_)
-        // {
-        //     painter.drawLine(0, y, width_, y);
-        //     painter.drawText(center_.x, y - 2, QString::number(++counter * numbersFactor_));
-        // }
-
-        // counter = 0;
-        // for(int y = center_.y + segmentSize_; y < width_; y += segmentSize_)
-        // {
-        //     painter.drawLine(0, y, width_, y);
-        //     painter.drawText(center_.x, y - 2, QString::number(--counter * numbersFactor_));
-        // }
-
         paintCoordinateLines(painter, segmentSize_);
     }
 
@@ -189,7 +174,6 @@ private:
 
     void paintCoordinateLines(QPainter& painter, double step)
     {
-
         int counter;
         double x, y;
         double penWidth = painter.pen().widthF();
@@ -228,7 +212,7 @@ private:
             painter.drawLine(0, y, width_, y);
             if (penWidth == auxiliaryAxisWidth_)
             {
-                counter--;
+                counter++;
                 drawCoordinateText(painter, counter, y, false);
             }
             y -= step;
@@ -241,7 +225,7 @@ private:
             painter.drawLine(0, y, width_, y);
             if (penWidth == auxiliaryAxisWidth_)
             {
-                counter++;
+                counter--;
                 drawCoordinateText(painter, counter, y, false);
             }
             y += step;
@@ -253,8 +237,16 @@ private:
         QPen prevPen = painter.pen();
         painter.setPen(Qt::black);
 
-        QString number = QString::number(counter * coordinatesFactor_);
+        double value = counter * coordinatesFactor_;
+        QString number = QString::number(value);
         QRect boundingRect = painter.fontMetrics().boundingRect(number);
+
+        if (boundingRect.width() > 3 * minSegmentSize_ / 4)
+        {
+            // number = QString::number(value, 'g', 3);
+            number = QString::number(value);
+            boundingRect = painter.fontMetrics().boundingRect(number);
+        }
 
         horizontal ?
             painter.drawText(coord - boundingRect.width() / 2, calculateY(boundingRect), number)
@@ -281,8 +273,8 @@ private:
 
     struct Point
     {
-        int x;
-        int y;
+        double x;
+        double y;
     } center_, mouseStart_, mouseEnd_;
 
     int width_;
@@ -296,7 +288,7 @@ private:
     double segmentSize_;
     double minSegmentSize_;
     double maxSegmentSize_;
-    double diffminSegmentSize_;
+    double diffSegmentSize_;
 
     double maxZoom_;
     double minZoom_;
