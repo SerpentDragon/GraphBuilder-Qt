@@ -114,8 +114,8 @@ protected:
                 segmentSize_ = minSegmentSize_;
                 coordinatesFactor_ /= zoomCoefficient_;
 
-                dx /= (zoomCoefficient_);
-                dy /= (zoomCoefficient_);
+                dx -= dx / maxSegmentSize_ * segmentSize_ * zoomCoefficient_;
+                dy -= dy / maxSegmentSize_ * segmentSize_ * zoomCoefficient_;
             }
             else
             {
@@ -131,8 +131,8 @@ protected:
                 segmentSize_ = maxSegmentSize_;
                 coordinatesFactor_ *= zoomCoefficient_;
 
-                dx *= (1 - zoomCoefficient_);
-                dy *= (1 - zoomCoefficient_);
+                dx -= dx / minSegmentSize_ * segmentSize_ / zoomCoefficient_;
+                dy -= dy / minSegmentSize_ * segmentSize_ / zoomCoefficient_;
             }
             else
             {
