@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/abs.png</file>
+        <file>images/delete.png</file>
+        <file>images/div.png</file>
+        <file>images/exp.png</file>
+        <file>images/mul.png</file>
+        <file>images/pi.png</file>
+        <file>images/pow.png</file>
+        <file>images/sqrt.png</file>
+    </qresource>
+</RCC>

@@ -556,7 +556,17 @@
      </size>
     </property>
     <property name="text">
-     <string>abs</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/abs.png</normaloff>:/images/images/abs.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>35</width>
+      <height>35</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="lnButton">
@@ -956,7 +966,17 @@
      </size>
     </property>
     <property name="text">
-     <string>exp</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/exp.png</normaloff>:/images/images/exp.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="commaButton">
@@ -1006,7 +1026,17 @@
      </size>
     </property>
     <property name="text">
-     <string>pow</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/pow.png</normaloff>:/images/images/pow.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="piButton">
@@ -1031,7 +1061,17 @@
      </size>
     </property>
     <property name="text">
-     <string>pi</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/pi.png</normaloff>:/images/images/pi.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="deleteButton">
@@ -1056,7 +1096,17 @@
      </size>
     </property>
     <property name="text">
-     <string>del</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/delete.png</normaloff>:/images/images/delete.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>40</width>
+      <height>40</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="sqrtButton">
@@ -1081,7 +1131,17 @@
      </size>
     </property>
     <property name="text">
-     <string>sqrt</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/sqrt.png</normaloff>:/images/images/sqrt.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="mulButton">
@@ -1106,7 +1166,17 @@
      </size>
     </property>
     <property name="text">
-     <string>*</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/mul.png</normaloff>:/images/images/mul.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="divButton">
@@ -1131,7 +1201,17 @@
      </size>
     </property>
     <property name="text">
-     <string>/</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="resource.qrc">
+      <normaloff>:/images/images/div.png</normaloff>:/images/images/div.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QPushButton" name="modButton">
@@ -1371,6 +1451,8 @@ border: 1px solid black; </string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

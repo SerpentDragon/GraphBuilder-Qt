@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->radianRadioButton->setChecked(true);
+
     model = new QStandardItemModel(this);
 
     QStandardItem *item = new QStandardItem("Text");
