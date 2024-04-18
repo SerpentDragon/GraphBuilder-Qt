@@ -13,6 +13,19 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    void createDigitButtonGroup();
+
+    void createOperationButtonGroup();
+
+    void createFunctionButtonGroup();
+
+    void setDigit(const QString&);
+
+    void setOperation(const QString&);
+
+    void setFunction(const QString&);
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
