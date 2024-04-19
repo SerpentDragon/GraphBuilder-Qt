@@ -1,10 +1,8 @@
-#include <QLayout>
-#include "plotter.h"
-#include <QListWidget>
 #include "mainwindow.h"
-#include <QButtonGroup>
 #include "./ui_mainwindow.h"
-#include <QStandardItemModel>
+
+Plotter* plotter = nullptr;
+const QString constants("1234567890)eπx");
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,9 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    createDigitButtonGroup();
-    createOperationButtonGroup();
-    createFunctionButtonGroup();
+    createButtonGroup(ui->digitGroupBox, &MainWindow::setDigit);
+    createButtonGroup(ui->operationGroupBox, &MainWindow::setOperation);
+    createButtonGroup(ui->functionGroupBox, &MainWindow::setFunction);
+    createButtonGroup(ui->constGroupBox, &MainWindow::setConst);
 
     ui->radianRadioButton->setChecked(true);
 
@@ -30,58 +29,28 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->listView->setModel(model);
 
-    Plotter* plotter = new Plotter(ui->widget, 60);
+    plotter = new Plotter(ui->widget, 60);
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete plotter;
 }
 
-void MainWindow::createDigitButtonGroup()
-{
-    QButtonGroup* digitGroup = new QButtonGroup(this);
 
-    QList<QPushButton*> buttons = this->findChildren<QPushButton*>();
-    for (auto button : buttons)
+void MainWindow::createButtonGroup(const QGroupBox* bg, void(MainWindow::*func)(const QString&))
+{
+    QList<QAbstractButton*> buttons = bg->findChildren<QAbstractButton*>();
+
+    for (QAbstractButton* button : buttons)
     {
-        if (button != nullptr)
-        {
-            bool res = false;
-            QString(button->text()).toInt(&res);
-            if (res)
-            {
-                digitGroup->addButton(button);
-            }
-        }
+        connect(button, &QPushButton::clicked, this,
+                [this, button, func]() { (this->*func)(button->text()); });
     }
-
-    connect(digitGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-            this, [this](QAbstractButton *button) { setDigit(button->text()); });
 }
 
-void MainWindow::createOperationButtonGroup()
-{
-    QButtonGroup* operationGroup = new QButtonGroup(this);
-
-    operationGroup->addButton(ui->sumButton);
-    operationGroup->addButton(ui->subtractButton);
-    operationGroup->addButton(ui->mulButton);
-    operationGroup->addButton(ui->divButton);
-
-    connect(operationGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-            this, [this](QAbstractButton *button) { setOperation(button->text()); });
-}
-
-void MainWindow::createFunctionButtonGroup()
-{
-    QButtonGroup* functionGroup = new QButtonGroup(this);
-
-    // logic here
-
-    connect(functionGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-           this, [this](QAbstractButton *button) { setFunction(button->text()); });
-}
 
 void MainWindow::setDigit(const QString& digit)
 {
@@ -98,13 +67,14 @@ void MainWindow::setDigit(const QString& digit)
     }
 }
 
+
 void MainWindow::setOperation(const QString& op)
 {
     QString expr = ui->expressionLabel->text();
     if (expr.size() != 0)
     {
         QChar lastSymbol = expr[expr.size() - 1];
-        if (QString("1234567890)xeπ").contains(lastSymbol) ||
+        if (constants.contains(lastSymbol) ||
             (lastSymbol == '(' && op == '-'))
         {
             ui->expressionLabel->setText(expr + op);
@@ -112,6 +82,7 @@ void MainWindow::setOperation(const QString& op)
     }
     else if (op == "-") ui->expressionLabel->setText("-");
 }
+
 
 void MainWindow::setFunction(const QString& func)
 {
@@ -125,13 +96,173 @@ void MainWindow::setFunction(const QString& func)
         QChar lastSymbol = expr[expr.size() - 1];
         if (func == "^")
         {
-            if (QString("1234567890exπ)").contains(lastSymbol))
+            if (constants.contains(lastSymbol))
                 ui->expressionLabel->setText(expr + func);
         }
+        else if (QString("+-*/%^(,").contains(lastSymbol))
+        {
+           ui->expressionLabel->setText(expr + func + "(");
+        }
+        else if (constants.contains(lastSymbol))
+            ui->expressionLabel->setText(expr + "*" + func + "(");
+    }
+}
+
+
+void MainWindow::setConst(const QString& c)
+{
+    QString expr = ui->expressionLabel->text();
+    if (expr.size() == 0) ui->expressionLabel->setText(c);
+    else
+    {
+        QChar lastSymbol = expr[expr.size() - 1];
+        if (QString("+-*/%^(,").contains(lastSymbol))
+            ui->expressionLabel->setText(expr + c);
+        else if (constants.contains(lastSymbol))
+            ui->expressionLabel->setText(expr + "*" + c);
+    }
+}
+
+
+void MainWindow::on_eraseButton_clicked()
+{
+    ui->expressionLabel->clear();
+}
+
+
+void MainWindow::on_deleteButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() == 0) return;
+
+    QChar lastSymbol = expr[expr.size() - 1];
+    if (lastSymbol == '(')
+    {
+        if (expr.size() == 1) ui->expressionLabel->clear();
         else
         {
-            if (QString("+-*/%^(,").contains(lastSymbol))
-                ui->expressionLabel->setText(expr + func + "(");
+            int i = expr.size() - 2;
+            while (i >= 0 && (expr[i].isLetter() || expr[i] == QChar(0x221A))) i--;
+            ui->expressionLabel->setText(expr.mid(0, ++i));
+        }
+    }
+    else
+    {
+        ui->expressionLabel->setText(expr.mid(0, expr.size() - 1));
+    }
+}
+
+
+void MainWindow::on_pointButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() != 0)
+    {
+        QChar lastSymbol = expr[expr.size() - 1];
+        if (lastSymbol.isDigit()) ui->expressionLabel->setText(expr + ".");
+    }
+}
+
+
+void MainWindow::on_commaButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() != 0)
+    {
+        int pos = expr.lastIndexOf("log(");
+
+        if (pos != -1)
+        {
+            pos += 3;
+            int bracketCounter = 0;
+            bool commaCounter = false;
+
+            do
+            {
+                if (expr[pos] == '(') bracketCounter++;
+                else if (expr[pos] == ')') bracketCounter--;
+                else if (expr[pos] == ',')
+                {
+                    commaCounter = true;
+                    break;
+                }
+                pos++;
+            }
+            while (pos < expr.size() && bracketCounter > 0);
+
+            if (bracketCounter > 0 &&
+                constants.contains(expr[expr.size() - 1])
+                && !commaCounter)
+            {
+                ui->expressionLabel->setText(expr + ",");
+            }
         }
     }
 }
+
+
+void MainWindow::on_openBracketButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() == 0) ui->expressionLabel->setText("(");
+    else
+    {
+        QChar lastSymbol = expr[expr.size() - 1];
+        if (QString("+-*/%^(,").contains(lastSymbol))
+        {
+            ui->expressionLabel->setText(expr + "(");
+        }
+        else if (constants.contains(lastSymbol))
+            ui->expressionLabel->setText(expr + "*(");
+    }
+}
+
+
+void MainWindow::on_closeBracketButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() != 0)
+    {
+        QChar lastSymbol = expr[expr.size() - 1];
+        if (constants.contains(lastSymbol))
+        {
+            ui->expressionLabel->setText(expr + ")");
+        }
+    }
+}
+
+
+void MainWindow::on_xButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() != 0) ui->expressionLabel->setText(expr + "x");
+    else
+    {
+        QChar lastSymbol = expr[expr.size() - 1];
+        if (constants.contains(lastSymbol))
+            ui->expressionLabel->setText(expr + "*x");
+        else setConst("x");
+    }
+}
+
+
+void MainWindow::on_modButton_clicked()
+{
+    QString expr = ui->expressionLabel->text();
+
+    if (expr.size() != 0)
+    {
+        QChar lastSymbol = expr[expr.size() - 1];
+        if (constants.contains(lastSymbol))
+        {
+            ui->expressionLabel->setText(expr + "%");
+        }
+    }
+}
+
