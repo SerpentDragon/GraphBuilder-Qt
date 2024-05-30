@@ -29,6 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         parsetree.h parsetree.cpp
         images/abs.png images/delete.png images/div.png images/exp.png images/mul.png images/pi.png images/pow.png images/sqrt.png
         resource.qrc
+        functionparser.h functionparser.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET GraphBuilder APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
