@@ -18,15 +18,15 @@ bool isFunction(std::string function)
 }
 }
 
-void ParseTree::SetExpression(std::string& expression)
+void ParseTree::setExpression(const std::string& func)
 {
-    expression = CheckBrackets(expression);
-    root_ = MakeTree(expression);
+    std::string expression = checkBrackets(func);
+    root_ = makeTree(expression);
 }
 
-double ParseTree::EvalTree(double x)
+double ParseTree::evalTree(double x)
 {
-    return EvalTree(root_, x);
+    return evalTree(root_, x);
 }
 
 ParseTree::~ParseTree()
@@ -34,11 +34,11 @@ ParseTree::~ParseTree()
     delete root_;
 }
 
-ParseTree::Node* ParseTree::MakeTree(const std::string& expr)
+ParseTree::Node* ParseTree::makeTree(const std::string& expr)
 {
     Node* node = new Node();
 
-    int index = LastOp(expr);
+    int index = lastOp(expr);
 
     if (index == -1 || index == 0)
     {
@@ -47,7 +47,7 @@ ParseTree::Node* ParseTree::MakeTree(const std::string& expr)
             if (index == 0)
             {
                 node->data = "-";
-                node->left = MakeTree(expr.substr(1));
+                node->left = makeTree(expr.substr(1));
                 node->right = nullptr;
             }
             else
@@ -56,17 +56,17 @@ ParseTree::Node* ParseTree::MakeTree(const std::string& expr)
 
                 if (node->data == "log")
                 {
-                    std::string arg1 = CheckBrackets(expr.substr(expr.find('(') + 1, expr.find(',') - expr.find('(')));
-                    std::string arg2 = CheckBrackets(expr.substr(expr.find(',') + 1, expr.size() - 2 - expr.find(',')));
+                    std::string arg1 = checkBrackets(expr.substr(expr.find('(') + 1, expr.find(',') - expr.find('(')));
+                    std::string arg2 = checkBrackets(expr.substr(expr.find(',') + 1, expr.size() - 2 - expr.find(',')));
 
-                    node->left = MakeTree(arg1);
-                    node->right = MakeTree(arg2);
+                    node->left = makeTree(arg1);
+                    node->right = makeTree(arg2);
                 }
                 else
                 {
-                    std::string arg = CheckBrackets(expr.substr(expr.find('(') + 1, expr.size() - 2 - expr.find('(')));
+                    std::string arg = checkBrackets(expr.substr(expr.find('(') + 1, expr.size() - 2 - expr.find('(')));
 
-                    node->left = MakeTree(arg);
+                    node->left = makeTree(arg);
                     node->right = nullptr;
                 }
             }
@@ -80,18 +80,18 @@ ParseTree::Node* ParseTree::MakeTree(const std::string& expr)
     }
     else
     {
-        std::string leftTree = CheckBrackets(expr.substr(0, index));
-        std::string rightTree = CheckBrackets(expr.substr(index + 1, expr.size() - 1 - index));
+        std::string leftTree = checkBrackets(expr.substr(0, index));
+        std::string rightTree = checkBrackets(expr.substr(index + 1, expr.size() - 1 - index));
 
         node->data = expr[index];
-        node->left = MakeTree(leftTree);
-        node->right = MakeTree(rightTree);
+        node->left = makeTree(leftTree);
+        node->right = makeTree(rightTree);
     }
 
     return node;
 }
 
-double ParseTree::EvalTree(Node* node, double x)
+double ParseTree::evalTree(Node* node, double x)
 {
     if (node->left == nullptr)
     {
@@ -105,8 +105,8 @@ double ParseTree::EvalTree(Node* node, double x)
     }
     else
     {
-        double left = EvalTree(node->left, x);
-        double right = node->right == nullptr ? 0 : EvalTree(node->right, x);
+        double left = evalTree(node->left, x);
+        double right = node->right == nullptr ? 0 : evalTree(node->right, x);
         double res;
 
         if (node->data == "+") return left + right;
@@ -136,7 +136,7 @@ double ParseTree::EvalTree(Node* node, double x)
     }
 }
 
-std::string ParseTree::CheckBrackets(std::string expr)
+std::string ParseTree::checkBrackets(const std::string expr)
 {
     while (expr[0] == '(')
     {
@@ -168,7 +168,7 @@ std::string ParseTree::CheckBrackets(std::string expr)
     return expr;
 }
 
-int ParseTree::LastOp(const std::string& expr)
+int ParseTree::lastOp(const std::string& expr)
 {
     int minPriority = 5;
     int lastOpIndex = -1;
@@ -179,10 +179,10 @@ int ParseTree::LastOp(const std::string& expr)
         if (expr[i] == '(') bracketsCounter++;
         else if (expr[i] == ')') bracketsCounter--;
 
-        int priority = Priority(expr[i]);
-        if (priority <= minPriority && bracketsCounter == 0)
+        int prior = priority(expr[i]);
+        if (prior <= minPriority && bracketsCounter == 0)
         {
-            minPriority = priority;
+            minPriority = prior;
             lastOpIndex = i;
         }
     }
@@ -190,7 +190,7 @@ int ParseTree::LastOp(const std::string& expr)
     return lastOpIndex;
 }
 
-int ParseTree::Priority(char op)
+int ParseTree::priority(char op)
 {
     switch (op)
     {

@@ -9,9 +9,9 @@ class ParseTree
 {
 public:
 
-    void SetExpression(std::string&);
+    void setExpression(const std::string&);
 
-    double EvalTree(double = 0);
+    double evalTree(double = 0);
 
     ~ParseTree();
 
@@ -32,15 +32,15 @@ private:
 
 private:
 
-    Node* MakeTree(const std::string&);
+    Node* makeTree(const std::string&);
 
-    double EvalTree(Node*, double);
+    double evalTree(Node*, double);
 
-    std::string CheckBrackets(std::string);
+    std::string checkBrackets(const std::string);
 
-    int LastOp(const std::string&);
+    int lastOp(const std::string&);
 
-    int Priority(char);
+    int priority(char);
 
 private:
 

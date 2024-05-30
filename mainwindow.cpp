@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 
 Plotter* plotter = nullptr;
+ParseTree parser;
 const QString constants("1234567890)eπx");
 
 MainWindow::MainWindow(QWidget *parent)
@@ -104,7 +105,9 @@ void MainWindow::setFunction(const QString& func)
            ui->expressionLabel->setText(expr + func + "(");
         }
         else if (constants.contains(lastSymbol))
+        {
             ui->expressionLabel->setText(expr + "*" + func + "(");
+        }
     }
 }
 
@@ -117,9 +120,13 @@ void MainWindow::setConst(const QString& c)
     {
         QChar lastSymbol = expr[expr.size() - 1];
         if (QString("+-*/%^(,").contains(lastSymbol))
+        {
             ui->expressionLabel->setText(expr + c);
+        }
         else if (constants.contains(lastSymbol))
+        {
             ui->expressionLabel->setText(expr + "*" + c);
+        }
     }
 }
 
@@ -217,7 +224,9 @@ void MainWindow::on_openBracketButton_clicked()
             ui->expressionLabel->setText(expr + "(");
         }
         else if (constants.contains(lastSymbol))
+        {
             ui->expressionLabel->setText(expr + "*(");
+        }
     }
 }
 
@@ -241,12 +250,14 @@ void MainWindow::on_xButton_clicked()
 {
     QString expr = ui->expressionLabel->text();
 
-    if (expr.size() != 0) ui->expressionLabel->setText(expr + "x");
+    if (expr.size() == 0) ui->expressionLabel->setText(expr + "x");
     else
     {
         QChar lastSymbol = expr[expr.size() - 1];
         if (constants.contains(lastSymbol))
+        {
             ui->expressionLabel->setText(expr + "*x");
+        }
         else setConst("x");
     }
 }
@@ -266,3 +277,11 @@ void MainWindow::on_modButton_clicked()
     }
 }
 
+
+void MainWindow::on_equalsButton_clicked()
+{
+    std::string expression = ui->expressionLabel->text().toStdString();
+    parser.setExpression(expression);
+
+    // calculation logic
+}

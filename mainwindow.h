@@ -6,6 +6,7 @@
 #include <QGroupBox>
 #include <QListWidget>
 #include <QMainWindow>
+#include "parsetree.h"
 #include <QButtonGroup>
 #include <QStandardItemModel>
 
@@ -56,6 +57,8 @@ private slots:
     void on_xButton_clicked();
 
     void on_modButton_clicked();
+
+    void on_equalsButton_clicked();
 
 private:
     Ui::MainWindow *ui;

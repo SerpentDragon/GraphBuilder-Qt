@@ -1601,6 +1601,23 @@ QGroupBox * {
      <string>.</string>
     </property>
    </widget>
+   <zorder>eraseButton</zorder>
+   <zorder>openBracketButton</zorder>
+   <zorder>xButton</zorder>
+   <zorder>closeBracketButton</zorder>
+   <zorder>commaButton</zorder>
+   <zorder>deleteButton</zorder>
+   <zorder>modButton</zorder>
+   <zorder>degreesGroupBox</zorder>
+   <zorder>expressionLabel</zorder>
+   <zorder>graphicListGroupBox</zorder>
+   <zorder>widget</zorder>
+   <zorder>digitGroupBox</zorder>
+   <zorder>operationGroupBox</zorder>
+   <zorder>functionGroupBox</zorder>
+   <zorder>constGroupBox</zorder>
+   <zorder>pointButton</zorder>
+   <zorder>equalsButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1608,7 +1625,7 @@ QGroupBox * {
      <x>0</x>
      <y>0</y>
      <width>950</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
