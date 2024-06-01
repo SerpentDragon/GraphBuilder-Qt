@@ -2,20 +2,23 @@
 
 namespace Functions
 {
-std::vector<std::string> functions = { "sin", "cos", "tg", "ctg", "asin", "acos", "atg",
-                                      "actg", "sinh", "cosh", "tgh", "ctgh", "ln", "lg", "log", "abs", "sqrt" };
+    std::vector<std::string> functions = { "sin", "cos", "tg", "ctg", "asin", "acos", "atg",
+                                          "actg", "sinh", "cosh", "tgh", "ctgh", "ln", "lg",
+                                          "log", "abs", "sqrt" };
 
-bool isFunction(std::string function)
-{
-    if (function[0] == '-') function = function.substr(1);
-
-    for (const auto& func : functions)
+    bool isFunction(const std::string& function)
     {
-        if (function.find(func) == 0) return true;
-    }
+        std::string func = function;
 
-    return false;
-}
+        if (func[0] == '-') func = func.substr(1);
+
+        for (const auto& f : functions)
+        {
+            if (func.find(f) == 0) return true;
+        }
+
+        return false;
+    }
 }
 
 void ParseTree::setExpression(const std::string& func)
@@ -136,23 +139,25 @@ double ParseTree::evalTree(Node* node, double x)
     }
 }
 
-std::string ParseTree::checkBrackets(const std::string expr)
+std::string ParseTree::checkBrackets(const std::string& expr)
 {
-    while (expr[0] == '(')
+    std::string expression = expr;
+
+    while (expression[0] == '(')
     {
         int bracketsCounter = 0;
         bool stop = false;
 
-        for (int i = 0; i < expr.size(); i++)
+        for (int i = 0; i < expression.size(); i++)
         {
-            if (expr[i] == '(') bracketsCounter++;
-            else if (expr[i] == ')') bracketsCounter--;
+            if (expression[i] == '(') bracketsCounter++;
+            else if (expression[i] == ')') bracketsCounter--;
 
             if (bracketsCounter == 0)
             {
-                if (i == expr.size() - 1)
+                if (i == expression.size() - 1)
                 {
-                    expr = expr.substr(1, expr.size() - 2);
+                    expression = expression.substr(1, expr.size() - 2);
                 }
                 else
                 {
@@ -165,7 +170,7 @@ std::string ParseTree::checkBrackets(const std::string expr)
         if (stop) break;
     }
 
-    return expr;
+    return expression;
 }
 
 int ParseTree::lastOp(const std::string& expr)

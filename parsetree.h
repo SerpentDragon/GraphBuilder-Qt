@@ -36,7 +36,7 @@ private:
 
     double evalTree(Node*, double);
 
-    std::string checkBrackets(const std::string);
+    std::string checkBrackets(const std::string&);
 
     int lastOp(const std::string&);
 
