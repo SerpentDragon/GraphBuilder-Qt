@@ -1,9 +1,8 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-Plotter* plotter = nullptr;
-ParseTree parser;
-const QString constants("1234567890)eπx");
+Graph graph;
+Plotter* plotter;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,19 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->radianRadioButton->setChecked(true);
 
-    QStandardItemModel* model = new QStandardItemModel(this);
-
-    QStandardItem *item = new QStandardItem("Text");
-    item->setCheckable(true);
-    item->setCheckState(Qt::Checked);
-    item->setEditable(false);
-    item->setSizeHint(QSize(item->sizeHint().rwidth(), 30));
-
-    model->appendRow(item);
-
-    ui->listView->setModel(model);
-
-    plotter = new Plotter(ui->widget, 60);
+    plotter = new Plotter(ui->widget, WidgetParams::PlotterSegmentSize);
 }
 
 
@@ -38,6 +25,22 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete plotter;
+}
+
+
+void MainWindow::addItemToListView(const QString& function)
+{
+    QStandardItemModel* model = new QStandardItemModel(this);
+
+    QStandardItem *item = new QStandardItem(function);
+    item->setCheckable(true);
+    item->setCheckState(Qt::Checked);
+    item->setEditable(false);
+    item->setSizeHint(QSize(item->sizeHint().rwidth(), WidgetParams::listViewItemHeight));
+
+    model->appendRow(item);
+
+    ui->listView->setModel(model);
 }
 
 
@@ -60,8 +63,7 @@ void MainWindow::setDigit(const QString& digit)
     if (expr.size() == 0) ui->expressionLabel->setText(expr + digit);
     else
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (QString("+-*/%(^.,1234567890").contains(lastSymbol))
+        if (AllowedSymbols::digitAllowedSymbols.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + digit);
         }
@@ -74,9 +76,8 @@ void MainWindow::setOperation(const QString& op)
     QString expr = ui->expressionLabel->text();
     if (expr.size() != 0)
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (constants.contains(lastSymbol) ||
-            (lastSymbol == '(' && op == '-'))
+        if (AllowedSymbols::constants.contains(expr.back()) ||
+            (expr.back() == '(' && op == '-'))
         {
             ui->expressionLabel->setText(expr + op);
         }
@@ -94,17 +95,17 @@ void MainWindow::setFunction(const QString& func)
     }
     else
     {
-        QChar lastSymbol = expr[expr.size() - 1];
+        QChar lastSymbol = expr.back();
         if (func == "^")
         {
-            if (constants.contains(lastSymbol))
+            if (AllowedSymbols::constants.contains(lastSymbol))
                 ui->expressionLabel->setText(expr + func);
         }
-        else if (QString("+-*/%^(,").contains(lastSymbol))
+        else if (AllowedSymbols::operators.contains(lastSymbol))
         {
            ui->expressionLabel->setText(expr + func + "(");
         }
-        else if (constants.contains(lastSymbol))
+        else if (AllowedSymbols::constants.contains(lastSymbol))
         {
             ui->expressionLabel->setText(expr + "*" + func + "(");
         }
@@ -118,12 +119,11 @@ void MainWindow::setConst(const QString& c)
     if (expr.size() == 0) ui->expressionLabel->setText(c);
     else
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (QString("+-*/%^(,").contains(lastSymbol))
+        if (AllowedSymbols::operators.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + c);
         }
-        else if (constants.contains(lastSymbol))
+        else if (AllowedSymbols::constants.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + "*" + c);
         }
@@ -143,8 +143,7 @@ void MainWindow::on_deleteButton_clicked()
 
     if (expr.size() == 0) return;
 
-    QChar lastSymbol = expr[expr.size() - 1];
-    if (lastSymbol == '(')
+    if (expr.back() == '(')
     {
         if (expr.size() == 1) ui->expressionLabel->clear();
         else
@@ -167,8 +166,7 @@ void MainWindow::on_pointButton_clicked()
 
     if (expr.size() != 0)
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (lastSymbol.isDigit()) ui->expressionLabel->setText(expr + ".");
+        if (expr.back().isDigit()) ui->expressionLabel->setText(expr + ".");
     }
 }
 
@@ -201,7 +199,7 @@ void MainWindow::on_commaButton_clicked()
             while (pos < expr.size() && bracketCounter > 0);
 
             if (bracketCounter > 0 &&
-                constants.contains(expr[expr.size() - 1])
+                AllowedSymbols::constants.contains(expr.back())
                 && !commaCounter)
             {
                 ui->expressionLabel->setText(expr + ",");
@@ -218,12 +216,11 @@ void MainWindow::on_openBracketButton_clicked()
     if (expr.size() == 0) ui->expressionLabel->setText("(");
     else
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (QString("+-*/%^(,").contains(lastSymbol))
+        if (AllowedSymbols::operators.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + "(");
         }
-        else if (constants.contains(lastSymbol))
+        else if (AllowedSymbols::constants.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + "*(");
         }
@@ -237,8 +234,7 @@ void MainWindow::on_closeBracketButton_clicked()
 
     if (expr.size() != 0)
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (constants.contains(lastSymbol))
+        if (AllowedSymbols::constants.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + ")");
         }
@@ -253,8 +249,7 @@ void MainWindow::on_xButton_clicked()
     if (expr.size() == 0) ui->expressionLabel->setText(expr + "x");
     else
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (constants.contains(lastSymbol))
+        if (AllowedSymbols::constants.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + "*x");
         }
@@ -269,8 +264,7 @@ void MainWindow::on_modButton_clicked()
 
     if (expr.size() != 0)
     {
-        QChar lastSymbol = expr[expr.size() - 1];
-        if (constants.contains(lastSymbol))
+        if (AllowedSymbols::constants.contains(expr.back()))
         {
             ui->expressionLabel->setText(expr + "%");
         }
@@ -280,8 +274,42 @@ void MainWindow::on_modButton_clicked()
 
 void MainWindow::on_equalsButton_clicked()
 {
-    std::string expression = ui->expressionLabel->text().toStdString();
-    parser.setExpression(expression);
+    QString expression = ui->expressionLabel->text();
 
-    // calculation logic
+    if (expression.size() == 0) return;
+
+    std::stack<QChar> stk;
+    for(const QChar c : expression)
+    {
+        if (c == '(') stk.push(c);
+        else if (c == ')')
+        {
+            if (stk.empty())
+            {
+                QMessageBox::critical(this, "Error", "The nesting of parentheses is broken");
+                return;
+            }
+
+            stk.pop();
+        }
+    }
+
+    if (!stk.empty())
+    {
+        QMessageBox::critical(this, "Error", "The nesting of parentheses is broken");
+        return;
+    }
+
+    if (AllowedSymbols::operators.contains(expression.back()))
+    {
+        QMessageBox::critical(this, "Error", "Your expression is incorrect!");
+        return;
+    }
+
+    addItemToListView(expression);
+
+    graph.addFunction(expression.toStdString());
+    auto result = graph.calculateFunctions(plotter->getLeftLimit(), plotter->getRightLimit());
+
+    plotter->repaint();
 }

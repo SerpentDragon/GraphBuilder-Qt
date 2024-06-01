@@ -1,12 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <stack>
+#include "graph.h"
 #include <QLayout>
 #include "plotter.h"
 #include <QGroupBox>
+#include "settings.h"
 #include <QListWidget>
 #include <QMainWindow>
-#include "parsetree.h"
+#include <QMessageBox>
 #include <QButtonGroup>
 #include <QStandardItemModel>
 
@@ -21,6 +24,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
+    void addItemToListView(const QString&);
+
     void createButtonGroup(const QGroupBox*, void(MainWindow::*)(const QString&));
 
     void createDigitButtonGroup();
@@ -39,6 +44,7 @@ private:
 
 public:
     MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow();
 
 private slots:
