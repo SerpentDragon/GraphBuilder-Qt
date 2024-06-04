@@ -25,6 +25,8 @@ class MainWindow : public QMainWindow
 private:
     void addItemToListView(const QString&);
 
+    void checkBoxStatusChange(const QStandardItem* const );
+
     void createButtonGroup(const QGroupBox*, void(MainWindow::*)(const QString&));
 
     void createDigitButtonGroup();
@@ -68,6 +70,8 @@ private slots:
 private:
     Ui::MainWindow* ui;
 
-    Plotter* plotter;
+    Plotter* plotter_;
+
+    QStandardItemModel* itemModel_;
 };
 #endif // MAINWINDOW_H

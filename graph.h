@@ -24,6 +24,10 @@ public:
 
     void removeFunction();
 
+    void setChecked(int);
+
+    void setUnchecked(int);
+
     std::vector<std::pair<QColor, std::vector<QPointF>>> calculateFunctions(const double, const double) const;
 
 private:

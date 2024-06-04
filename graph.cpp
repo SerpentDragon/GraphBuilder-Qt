@@ -16,6 +16,22 @@ void Graph::removeFunction()
 
 }
 
+void Graph::setChecked(int index)
+{
+    if (0 <= index && index <= functions_.size())
+    {
+        functions_[index].isDrawable_ = true;
+    }
+}
+
+void Graph::setUnchecked(int index)
+{
+    if (0 <= index && index <= functions_.size())
+    {
+        functions_[index].isDrawable_ = false;
+    }
+}
+
 std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(const double left, const double right) const
 {
     constexpr static int intervals = 1000;
@@ -25,6 +41,8 @@ std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(c
 
     for(int i = 0; i < functions_.size(); i++)
     {
+        if (functions_[i].isDrawable_ == false) continue;
+
         QColor color = functions_[i].color_;
         std::vector<QPointF> functionValues;
         QPointF point;

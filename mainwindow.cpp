@@ -18,14 +18,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->radianRadioButton->setChecked(true);
 
-    plotter = new Plotter(ui->widget, WidgetParams::PlotterSegmentSize);
+    plotter_ = new Plotter(ui->widget, WidgetParams::PlotterSegmentSize);
+
+    // itemModel_ = new QStandardItemModel(this);
+    // connect(itemModel_, &QStandardItemModel::itemChanged, this, &MainWindow::checkBoxStatusChange);
 }
 
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete plotter;
 }
 
 
@@ -33,15 +35,29 @@ void MainWindow::addItemToListView(const QString& function)
 {
     static QStandardItemModel* model = new QStandardItemModel(this);
 
-    QStandardItem *item = new QStandardItem(function);
+    QStandardItem* item = new QStandardItem(function);
     item->setCheckable(true);
     item->setCheckState(Qt::Checked);
     item->setEditable(false);
     item->setSizeHint(QSize(item->sizeHint().rwidth(), WidgetParams::listViewItemHeight));
 
     model->appendRow(item);
+}
 
-    ui->listView->setModel(model);
+
+void MainWindow::checkBoxStatusChange(const QStandardItem* const item)
+{
+    if (item->isCheckable())
+    {
+        if (item->checkState() == Qt::Checked)
+        {
+            graph.setChecked(item->row());
+        }
+        else if (item->checkState() == Qt::Unchecked)
+        {
+            graph.setChecked(item->row());
+        }
+    }
 }
 
 
@@ -313,5 +329,5 @@ void MainWindow::on_equalsButton_clicked()
 
     graph.addFunction(expression.toStdString());
 
-    plotter->repaint();
+    plotter_->repaint();
 }

@@ -1,10 +1,10 @@
 #ifndef PARSETREE_H
 #define PARSETREE_H
 
+#include <cmath>
 #include <string>
 #include <memory>
 #include <vector>
-#include <QDebug>
 #include <numbers>
 
 class ParseTree
