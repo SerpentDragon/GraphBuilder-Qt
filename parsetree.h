@@ -1,9 +1,11 @@
 #ifndef PARSETREE_H
 #define PARSETREE_H
 
-#include <cmath>
 #include <string>
+#include <memory>
 #include <vector>
+#include <QDebug>
+#include <numbers>
 
 class ParseTree
 {
@@ -11,30 +13,22 @@ public:
 
     void setExpression(const std::string&);
 
-    double evalTree(double = 0);
-
-    ~ParseTree();
+    double evalTree(double = 0) const;
 
 private:
 
     struct Node
     {
-        Node* left = nullptr;
-        Node* right = nullptr;
+        std::shared_ptr<Node> left = nullptr;
+        std::shared_ptr<Node>  right = nullptr;
         std::string data;
-
-        ~Node()
-        {
-            delete left;
-            delete right;
-        }
     };
 
 private:
 
-    Node* makeTree(const std::string&);
+    std::shared_ptr<Node> makeTree(const std::string&);
 
-    double evalTree(Node*, double);
+    double evalTree(std::shared_ptr<Node>, double) const;
 
     std::string checkBrackets(const std::string&);
 
@@ -44,7 +38,7 @@ private:
 
 private:
 
-    Node* root_;
+    std::shared_ptr<Node> root_;
 };
 
 

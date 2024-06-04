@@ -27,17 +27,12 @@ void ParseTree::setExpression(const std::string& func)
     root_ = makeTree(expression);
 }
 
-double ParseTree::evalTree(double x)
+double ParseTree::evalTree(double x) const
 {
     return evalTree(root_, x);
 }
 
-ParseTree::~ParseTree()
-{
-    delete root_;
-}
-
-ParseTree::Node* ParseTree::makeTree(const std::string& expr)
+std::shared_ptr<ParseTree::Node> ParseTree::makeTree(const std::string& expr)
 {
     Node* node = new Node();
 
@@ -91,19 +86,19 @@ ParseTree::Node* ParseTree::makeTree(const std::string& expr)
         node->right = makeTree(rightTree);
     }
 
-    return node;
+    return std::make_shared<Node>(*node);
 }
 
-double ParseTree::evalTree(Node* node, double x)
+double ParseTree::evalTree(std::shared_ptr<Node> node, double x) const
 {
     if (node->left == nullptr)
     {
         std::string expr = node->data;
         int mul = expr[0] == '-' ? -1 : 1;
 
-        if (expr == "e") return mul * M_E;
-        else if (expr == "π") return mul * M_PI;
-        else if (expr == "x") return mul * x;
+        if (expr.contains('e')) return mul * std::numbers::e;
+        else if (expr.contains("π")) return mul * std::numbers::pi;
+        else if (expr.contains('x')) return mul * x;
         else return std::stod(expr);
     }
     else
