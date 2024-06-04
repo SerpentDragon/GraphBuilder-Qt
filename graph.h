@@ -1,18 +1,19 @@
-#ifndef FUNCTIONPARSER_H
-#define FUNCTIONPARSER_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
+#include <QPointF>
 #include <vector>
 #include <string>
 #include <qcolor.h>
 #include "parsetree.h"
 
-class FunctionParser
+class Graph
 {
 private:
 
     struct FunctionGraphic
     {
-        ParseTree pareTree_;
+        ParseTree parseTree_;
         bool isDrawable_;
         QColor color_;
     };
@@ -23,11 +24,11 @@ public:
 
     void removeFunction();
 
-    const std::vector<FunctionGraphic>& getFunctions() const;
+    std::vector<std::pair<QColor, std::vector<QPointF>>> calculateFunctions(const double, const double) const;
 
 private:
 
     std::vector<FunctionGraphic> functions_;
 };
 
-#endif // FUNCTIONPARSER_H
+#endif // GRAPH_H

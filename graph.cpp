@@ -1,23 +1,47 @@
-#include "functionparser.h"
+#include "graph.h"
 
-void FunctionParser::addFunction(const std::string& func)
+void Graph::addFunction(const std::string& func)
 {
     FunctionGraphic fg;
-    fg.pareTree_ = ParseTree();
-    fg.pareTree_.setExpression(func);
+    fg.parseTree_.setExpression(func);
 
     fg.isDrawable_ = true;
-    fg.color_ = QColor(rand() % 201 + 100, rand() % 201 + 100, rand() % 201 + 100);
+    fg.color_ = QColor(rand() % 101 + 100, rand() % 101 + 100, rand() % 101 + 100);
 
     functions_.emplace_back(fg);
 }
 
-void FunctionParser::removeFunction()
+void Graph::removeFunction()
 {
 
 }
 
-const std::vector<FunctionParser::FunctionGraphic>& FunctionParser::getFunctions() const
+std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(const double left, const double right) const
 {
-    return functions_;
+    constexpr static int intervals = 1000;
+    const double step = (right - left) / intervals;
+
+    std::vector<std::pair<QColor, std::vector<QPointF>>> calculations(functions_.size());
+
+    for(int i = 0; i < functions_.size(); i++)
+    {
+        QColor color = functions_[i].color_;
+        std::vector<QPointF> functionValues;
+        QPointF point;
+
+        for(double value = left; value <= right; value += step)
+        {
+            point.setX(value);
+
+            if (auto result = functions_[i].parseTree_.evalTree(value); !qIsNaN(result))
+            {
+                point.setY(result);
+                functionValues.emplace_back(point);
+            }
+        }
+
+        calculations[i] = { color, functionValues };
+    }
+
+    return calculations;
 }
