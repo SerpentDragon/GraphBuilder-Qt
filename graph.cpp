@@ -37,7 +37,7 @@ std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(c
     constexpr static int intervals = 1000;
     const double step = (right - left) / intervals;
 
-    std::vector<std::pair<QColor, std::vector<QPointF>>> calculations(functions_.size());
+    std::vector<std::pair<QColor, std::vector<QPointF>>> calculations;
 
     for(int i = 0; i < functions_.size(); i++)
     {
@@ -58,7 +58,7 @@ std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(c
             }
         }
 
-        calculations[i] = { color, functionValues };
+        calculations.push_back({ color, functionValues });
     }
 
     return calculations;

@@ -20,8 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     plotter_ = new Plotter(ui->widget, WidgetParams::PlotterSegmentSize);
 
-    // itemModel_ = new QStandardItemModel(this);
-    // connect(itemModel_, &QStandardItemModel::itemChanged, this, &MainWindow::checkBoxStatusChange);
+    itemModel_ = new QStandardItemModel(this);
+    connect(itemModel_, &QStandardItemModel::itemChanged, this, &MainWindow::checkBoxStatusChange);
 }
 
 
@@ -33,15 +33,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::addItemToListView(const QString& function)
 {
-    static QStandardItemModel* model = new QStandardItemModel(this);
-
     QStandardItem* item = new QStandardItem(function);
     item->setCheckable(true);
     item->setCheckState(Qt::Checked);
     item->setEditable(false);
     item->setSizeHint(QSize(item->sizeHint().rwidth(), WidgetParams::listViewItemHeight));
 
-    model->appendRow(item);
+    itemModel_->appendRow(item);
+
+    ui->listView->setModel(itemModel_);
 }
 
 
@@ -55,9 +55,11 @@ void MainWindow::checkBoxStatusChange(const QStandardItem* const item)
         }
         else if (item->checkState() == Qt::Unchecked)
         {
-            graph.setChecked(item->row());
+            graph.setUnchecked(item->row());
         }
     }
+
+    plotter_->repaint();
 }
 
 
