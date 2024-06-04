@@ -2,12 +2,13 @@
 #include "./ui_mainwindow.h"
 
 Graph graph;
-Plotter* plotter;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    srand(time(nullptr));
+
     ui->setupUi(this);
 
     createButtonGroup(ui->digitGroupBox, &MainWindow::setDigit);
@@ -30,7 +31,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::addItemToListView(const QString& function)
 {
-    QStandardItemModel* model = new QStandardItemModel(this);
+    static QStandardItemModel* model = new QStandardItemModel(this);
 
     QStandardItem *item = new QStandardItem(function);
     item->setCheckable(true);
@@ -278,6 +279,8 @@ void MainWindow::on_equalsButton_clicked()
 
     if (expression.size() == 0) return;
 
+    ui->expressionLabel->clear();
+
     std::stack<QChar> stk;
     for(const QChar c : expression)
     {
@@ -309,7 +312,6 @@ void MainWindow::on_equalsButton_clicked()
     addItemToListView(expression);
 
     graph.addFunction(expression.toStdString());
-    auto result = graph.calculateFunctions(plotter->getLeftLimit(), plotter->getRightLimit());
 
     plotter->repaint();
 }

@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <stack>
-#include "graph.h"
 #include <QLayout>
 #include "plotter.h"
 #include <QGroupBox>
@@ -67,6 +66,8 @@ private slots:
     void on_equalsButton_clicked();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
+
+    Plotter* plotter;
 };
 #endif // MAINWINDOW_H

@@ -1423,7 +1423,7 @@ QGroupBox * {
       </size>
      </property>
      <property name="text">
-      <string>pow</string>
+      <string>^</string>
      </property>
      <property name="icon">
       <iconset resource="resource.qrc">
