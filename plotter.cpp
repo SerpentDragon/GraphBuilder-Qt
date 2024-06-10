@@ -36,7 +36,7 @@ Plotter::Plotter(QWidget *parent, double segmentSize) : QWidget(parent)
 
 void Plotter::paintEvent(QPaintEvent *event)
 {
-    // QWidget::paintEvent(event);
+    QWidget::paintEvent(event);
 
     QPainter painter(this);
     painter.fillRect(rect(), Qt::white);
@@ -60,13 +60,24 @@ void Plotter::paintGraphics(QPainter& painter) const
 
         for(int i = 0; i < points.size() - 1; i++)
         {
-            double startX = center_.x + points[i].x() * segmentSize_ / coordinatesFactor_;
-            double startY = center_.y - points[i].y() * segmentSize_ / coordinatesFactor_;
+            // qDebug() << points[i].x() << " " << points[i].y() << Qt::endl;
+            // qDebug() << points[i].y() << " " << points[i + 1].y() << Qt::endl;
 
-            double endX = center_.x + points[i + 1].x() * segmentSize_ / coordinatesFactor_;
-            double endY = center_.y - points[i + 1].y() * segmentSize_ / coordinatesFactor_;
+            if (qIsNaN(points[i].y()) || qIsNaN(points[i + 1].y()) ||
+                qIsInf(points[i].y()) || qIsInf(points[i + 1].y()))
+            {
+                //q i++;
+                continue;
+            }
 
-            painter.drawLine(startX, startY, endX, endY);
+            if (!isInsideField(points[i]) && !isInsideField(points[i + 1])) continue;
+
+            // qDebug() << points[i].y() << " " << points[i + 1].y() << Qt::endl;
+
+            QPointF start = fromCartesianToWindow(points[i]);
+            QPointF end = fromCartesianToWindow(points[i + 1]);
+
+            painter.drawLine(start.x(), start.y(), end.x(), end.y());
         }
     }
 }
@@ -284,6 +295,20 @@ double Plotter::calculateY(const QRect& boundingRect) const
     else return center_.y - 2;
 }
 
+QPointF Plotter::fromCartesianToWindow(const QPointF& point) const
+{
+    return {
+            center_.x + point.x() * segmentSize_ / coordinatesFactor_,
+            center_.y - point.y() * segmentSize_ / coordinatesFactor_
+    };
+}
+
+bool Plotter::isInsideField(const QPointF& point) const
+{
+    return getLeftLimit() < point.x() && point.x() < getRightLimit()
+           && getBottomLimit() < point.y() && point.y() < getTopLimit();
+}
+
 double Plotter::getLeftLimit() const
 {
     return (-center_.x / segmentSize_) * coordinatesFactor_;
@@ -292,4 +317,14 @@ double Plotter::getLeftLimit() const
 double Plotter::getRightLimit() const
 {
     return ((width_ - center_.x) / segmentSize_) * coordinatesFactor_;
+}
+
+double Plotter::getTopLimit() const
+{
+    return (center_.y / segmentSize_) * coordinatesFactor_ + 1;
+}
+
+double Plotter::getBottomLimit() const
+{
+    return ((center_.y - height_) / segmentSize_) * coordinatesFactor_ - 1;
 }

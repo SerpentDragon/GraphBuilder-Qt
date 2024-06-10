@@ -42,9 +42,17 @@ private:
 
     double calculateY(const QRect&) const;
 
+    QPointF fromCartesianToWindow(const QPointF&) const;
+
+    bool isInsideField(const QPointF&) const;
+
     double getLeftLimit() const;
 
     double getRightLimit() const;
+
+    double getTopLimit() const;
+
+    double getBottomLimit() const;
 
 private:
 

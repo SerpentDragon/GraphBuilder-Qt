@@ -5,7 +5,7 @@
 
 namespace WidgetParams
 {
-    constexpr int PlotterSegmentSize = 60;
+    constexpr int plotterSegmentSize = 60;
     constexpr int listViewItemHeight = 30;
 };
 
@@ -15,5 +15,10 @@ namespace AllowedSymbols
     const QString digitAllowedSymbols("+-*/%(^.,1234567890");
     const QString operators("+-*/%^(,");
 };
+
+namespace MathParams
+{
+    constexpr double Precision = 4.0;
+}
 
 #endif // SETTINGS_H
