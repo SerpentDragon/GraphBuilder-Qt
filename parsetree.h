@@ -7,6 +7,8 @@
 #include <vector>
 #include <numbers>
 
+enum PRIORITY : unsigned short;
+
 class ParseTree
 {
 public:
@@ -34,7 +36,7 @@ private:
 
     int lastOp(const std::string&);
 
-    int priority(char);
+    PRIORITY priority(char);
 
 private:
 
