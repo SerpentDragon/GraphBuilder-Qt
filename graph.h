@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <qcolor.h>
+#include "settings.h"
 #include "parsetree.h"
 
 class Graph
