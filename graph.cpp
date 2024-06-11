@@ -32,12 +32,15 @@ void Graph::setUnchecked(int index)
     }
 }
 
-std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(const double left, const double right) const
+GraphLines Graph::calculateFunctions(double left, double right, double coordinatesFactor) const
 {
-    static int intervals = std::pow(10, MathParams::Precision);
-    const double step = (right - left) / intervals;
+    double step = right - left;
 
-    std::vector<std::pair<QColor, std::vector<QPointF>>> calculations;
+    step = coordinatesFactor < 1 ?
+               step /= std::pow(10, MathParams::Precision) :
+               step *= std::pow(10, -MathParams::Precision);
+
+    GraphLines calculations;
 
     for(int i = 0; i < functions_.size(); i++)
     {
@@ -45,6 +48,7 @@ std::vector<std::pair<QColor, std::vector<QPointF>>> Graph::calculateFunctions(c
 
         QColor color = functions_[i].color_;
         std::vector<QPointF> functionValues;
+        // auto breakPoints = functions_[i].parseTree_.findBreakPoints(left, right);
         QPointF point;
 
         for(double value = left; value <= right; value += step)

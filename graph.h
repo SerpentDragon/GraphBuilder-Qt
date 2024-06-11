@@ -8,6 +8,8 @@
 #include "settings.h"
 #include "parsetree.h"
 
+using GraphLines = std::vector<std::pair<QColor, std::vector<QPointF>>>;
+
 class Graph
 {
 private:
@@ -29,7 +31,7 @@ public:
 
     void setUnchecked(int);
 
-    std::vector<std::pair<QColor, std::vector<QPointF>>> calculateFunctions(const double, const double) const;
+    GraphLines calculateFunctions(double, double, double) const;
 
 private:
 
