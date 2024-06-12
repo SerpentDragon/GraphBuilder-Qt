@@ -1,6 +1,6 @@
 #include "plotter.h"
 
-Plotter::Plotter(QWidget *parent, double segmentSize) : QWidget(parent)
+Plotter::Plotter(QWidget* parent, double segmentSize) : QWidget(parent)
 {
     if (parent != nullptr)
     {
@@ -13,13 +13,11 @@ Plotter::Plotter(QWidget *parent, double segmentSize) : QWidget(parent)
         mainAxisWidth_ = 1.5;
         auxiliaryAxisWidth_ = 0.5;
         additionalAxisWidth_ = 0.25;
-        graphLineWidth_ = 2.5;
-        functionLineWidth_ = 3.0;
+        graphLineWidth_ = 2.8;
+        fontSize_ = 12.0;
 
-        maxZoom_ = 1920;
-        minZoom_ = 2;
-        zoomCoefficient_ = 2;
-        coordinatesFactor_ = 1;
+        zoomCoefficient_ = 2.0;
+        coordinatesFactor_ = 1.0;
 
         segmentSize_ = segmentSize;
         minSegmentSize_ = segmentSize;
@@ -32,6 +30,23 @@ Plotter::Plotter(QWidget *parent, double segmentSize) : QWidget(parent)
 
         setGeometry(0, 0, parent->size().width(), parent->size().height());
     }
+}
+
+void Plotter::addFunction(const std::string& function)
+{
+    graph_.addFunction(function);
+
+    this->repaint();
+}
+
+void Plotter::displayFunction(int index)
+{
+    graph_.setChecked(index);
+}
+
+void Plotter::hideFunction(int index)
+{
+    graph_.setUnchecked(index);
 }
 
 void Plotter::paintEvent(QPaintEvent *event)
@@ -49,14 +64,14 @@ void Plotter::paintEvent(QPaintEvent *event)
 
 void Plotter::paintGraphics(QPainter& painter) const
 {
-    auto result = graph.calculateFunctions(getLeftLimit(), getRightLimit());
+    auto result = graph_.calculateFunctions(getLeftLimit(), getRightLimit(), coordinatesFactor_);
 
     for(const auto& function : result)
     {
         QColor color = function.first;
         auto points = function.second;
 
-        painter.setPen(QPen{ color, functionLineWidth_ });
+        painter.setPen(QPen{ color, graphLineWidth_ });
 
         for(int i = 0; i < points.size() - 1; i++)
         {
@@ -64,20 +79,18 @@ void Plotter::paintGraphics(QPainter& painter) const
             // qDebug() << points[i].y() << " " << points[i + 1].y() << Qt::endl;
 
             if (qIsNaN(points[i].y()) || qIsNaN(points[i + 1].y()) ||
-                qIsInf(points[i].y()) || qIsInf(points[i + 1].y()))
-            {
-                //q i++;
-                continue;
-            }
+                qIsInf(points[i].y()) || qIsInf(points[i + 1].y())) continue;
 
             if (!isInsideField(points[i]) && !isInsideField(points[i + 1])) continue;
 
             // qDebug() << points[i].y() << " " << points[i + 1].y() << Qt::endl;
 
+            // qDebug() << points[i].x() << " " << points[i].y() << Qt::endl;
+
             QPointF start = fromCartesianToWindow(points[i]);
             QPointF end = fromCartesianToWindow(points[i + 1]);
 
-            painter.drawLine(start.x(), start.y(), end.x(), end.y());
+            painter.drawLine(start, end);
         }
     }
 }
@@ -260,23 +273,26 @@ void Plotter::paintCoordinateLines(QPainter& painter, double step) const
 
 void Plotter::paintCoordinateText(QPainter& painter, int counter, double coord, bool horizontal) const
 {
+    static QFont font = painter.font();
+
+    QString number = QString::number(counter * coordinatesFactor_);
+    QRect boundingRect = painter.fontMetrics().boundingRect(number);
+
+    if (boundingRect.width() >= minSegmentSize_ / 2)
+    {
+        font.setPointSizeF(2 * fontSize_ / 3);
+        boundingRect = painter.fontMetrics().boundingRect(number);
+    }
+    else font.setPointSizeF(fontSize_);
+
+    painter.setFont(font);
+
     QPen prevPen = painter.pen();
     painter.setPen(Qt::black);
 
-    double value = counter * coordinatesFactor_;
-    QString number = QString::number(value);
-    QRect boundingRect = painter.fontMetrics().boundingRect(number);
-
-    if (boundingRect.width() > 3 * minSegmentSize_ / 4)
-    {
-        // number = QString::number(value, 'g', 3);
-        number = QString::number(value);
-        boundingRect = painter.fontMetrics().boundingRect(number);
-    }
-
     horizontal ?
         painter.drawText(coord - boundingRect.width() / 2, calculateY(boundingRect), number)
-               : painter.drawText(calculateX(boundingRect), coord + boundingRect.height() / 3, number);
+        : painter.drawText(calculateX(boundingRect), coord + boundingRect.height() / 3, number);
 
     painter.setPen(prevPen);
 }

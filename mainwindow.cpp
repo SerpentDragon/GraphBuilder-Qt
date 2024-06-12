@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-Graph graph;
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -17,8 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     createButtonGroup(ui->constGroupBox, &MainWindow::setConst);
 
     ui->radianRadioButton->setChecked(true);
-
-    plotter_ = new Plotter(ui->widget, WidgetParams::PlotterSegmentSize);
+    
+    plotter_ = new Plotter(ui->widget, WidgetParams::plotterSegmentSize);
 
     itemModel_ = new QStandardItemModel(this);
     connect(itemModel_, &QStandardItemModel::itemChanged, this, &MainWindow::checkBoxStatusChange);
@@ -51,11 +49,11 @@ void MainWindow::checkBoxStatusChange(const QStandardItem* const item)
     {
         if (item->checkState() == Qt::Checked)
         {
-            graph.setChecked(item->row());
+            plotter_->displayFunction(item->row());
         }
         else if (item->checkState() == Qt::Unchecked)
         {
-            graph.setUnchecked(item->row());
+            plotter_->hideFunction(item->row());
         }
     }
 
@@ -294,10 +292,12 @@ void MainWindow::on_modButton_clicked()
 void MainWindow::on_equalsButton_clicked()
 {
     QString expression = ui->expressionLabel->text();
+    // expression = "x^2-abs(x+1)/(x+1)-1";
+    // expression = "(x^2-5*x+4)/(x^2+7/x-12)";
+    // expression = "(x-3)/ctgh(x)";
+    // expression = "ctg(x)";
 
     if (expression.size() == 0) return;
-
-    ui->expressionLabel->clear();
 
     std::stack<QChar> stk;
     for(const QChar c : expression)
@@ -327,9 +327,9 @@ void MainWindow::on_equalsButton_clicked()
         return;
     }
 
+    ui->expressionLabel->clear();
+
     addItemToListView(expression);
 
-    graph.addFunction(expression.toStdString());
-
-    plotter_->repaint();
+    plotter_->addFunction(expression.toStdString());
 }

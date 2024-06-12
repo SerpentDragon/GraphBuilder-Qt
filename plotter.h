@@ -1,18 +1,23 @@
 #ifndef PLOTTER_H
 #define PLOTTER_H
 
+#include <thread>
 #include <QWidget>
 #include <QLayout>
 #include "graph.h"
 #include <QPainter>
 #include <QMouseEvent>
 
-extern Graph graph;
-
 class Plotter : public QWidget
 {
 public:
     Plotter(QWidget* = nullptr, double = 0);
+
+    void addFunction(const std::string&);
+
+    void displayFunction(int);
+
+    void hideFunction(int);
 
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -69,21 +74,21 @@ private:
     double auxiliaryAxisWidth_;
     double additionalAxisWidth_;
     double graphLineWidth_;
-    double functionLineWidth_;
+    double fontSize_;
 
     double segmentSize_;
     double minSegmentSize_;
     double maxSegmentSize_;
     double diffSegmentSize_;
 
-    double maxZoom_;
-    double minZoom_;
     double zoomCoefficient_;
     double coordinatesFactor_;
 
     QColor mainAxisColor_;
     QColor auxiliaryAxisColor_;
     QColor additionalAxisColor_;
+
+    Graph graph_;
 };
 
 #endif // PLOTTER_H
