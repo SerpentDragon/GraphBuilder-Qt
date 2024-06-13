@@ -59,7 +59,6 @@ GraphLines Graph::calculateFunctions(double left, double right, double coordinat
 
         QColor color = functions_[i].color_;
         std::vector<QPointF> functionValues;
-        // auto breakPoints = functions_[i].parseTree_.findBreakPoints(left, right);
         QPointF point;
 
         for(double value = left; value <= right; value += step)
@@ -70,8 +69,79 @@ GraphLines Graph::calculateFunctions(double left, double right, double coordinat
             functionValues.emplace_back(point);
         }
 
-        calculations.push_back({ color, functionValues });
+        calculations.insert({ i, { color, functionValues } });
     }
 
     return calculations;
+}
+
+std::vector<double> Graph::findRupturePoints(int index, double left, double right) const
+{
+    auto limitFunctions = functions_[index].parseTree_.findLimitFunctions();
+
+    const gsl_root_fsolver_type *T = gsl_root_fsolver_brent;
+    gsl_root_fsolver *s = gsl_root_fsolver_alloc(T);
+
+    std::vector<double> breakPoints;
+
+    for(const auto& node : limitFunctions)
+    {
+        auto param = std::make_tuple(node, functions_[index].parseTree_, functions_[index].angle);
+
+        gsl_function F;
+        F.function = &findRoots;
+        F.params = reinterpret_cast<void*>(&param);
+
+        double root;
+        gsl_root_fsolver_set(s, &F, left, right);
+
+        try
+        {
+            int status, iter = 0;
+            do
+            {
+                status = gsl_root_fsolver_iterate(s);
+                root = gsl_root_fsolver_root(s);
+                left = gsl_root_fsolver_x_lower(s);
+                right = gsl_root_fsolver_x_upper(s);
+                status = gsl_root_test_interval(left, right, 0, std::pow(10, MathParams::Precision));
+            } while (status == GSL_CONTINUE && ++iter < 100);
+        }
+        catch(const std::exception& ex)
+        {
+            continue;
+        }
+
+        breakPoints.emplace_back(root);
+    }
+
+    gsl_root_fsolver_free(s);
+
+    return breakPoints;
+}
+
+std::vector<QPointF> Graph::calculateBrokenInterval(int index, double left, double right) const
+{
+    auto breakPoints = findRupturePoints(index, left, right);
+    auto func = functions_[index];
+
+    std::vector<QPointF> values(1, { left, func.parseTree_.evalTree(left, func.angle) });
+
+    if (!breakPoints.empty())
+    {
+        for(const double x : breakPoints)
+        {
+            double leftX = x - MathParams::Epsilon;
+            QPointF point{ leftX, func.parseTree_.evalTree(leftX, func.angle)};
+            values.emplace_back(point);
+
+            double rightX = x + MathParams::Epsilon;
+            point = { rightX, func.parseTree_.evalTree(rightX, func.angle)};
+            values.emplace_back(point);
+        }
+    }
+
+    values.emplace_back(QPointF{ right, func.parseTree_.evalTree(right, func.angle) });
+
+    return values;
 }

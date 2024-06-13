@@ -19,6 +19,7 @@ namespace AllowedSymbols
 namespace MathParams
 {
     constexpr double Precision = 4.0;
+    const double Epsilon = std::pow(10, -Precision);
 }
 
 #endif // SETTINGS_H

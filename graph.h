@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <tuple>
 #include <vector>
 #include <string>
 #include <memory>
@@ -8,8 +9,11 @@
 #include <QPointF>
 #include "settings.h"
 #include "parsetree.h"
+#include <unordered_map>
+#include <gsl/gsl_roots.h>
+#include <gsl/gsl_errno.h>
 
-using GraphLines = std::vector<std::pair<QColor, std::vector<QPointF>>>;
+using GraphLines = std::unordered_map<int, std::pair<QColor, std::vector<QPointF>>>;
 
 class Graph
 {
@@ -18,6 +22,8 @@ private:
     Graph(const Graph&) = delete;
 
     Graph& operator=(const Graph&) = delete;
+    
+    std::vector<double> findRupturePoints(int, double, double) const;
 
 private:
 
@@ -44,6 +50,8 @@ public:
     void hideFunction(int);
 
     GraphLines calculateFunctions(double, double, double) const;
+
+    std::vector<QPointF> calculateBrokenInterval(int, double, double) const;
 
 private:
 
