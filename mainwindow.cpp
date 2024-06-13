@@ -49,11 +49,11 @@ void MainWindow::checkBoxStatusChange(const QStandardItem* const item)
     {
         if (item->checkState() == Qt::Checked)
         {
-            plotter_->displayFunction(item->row());
+            Graph::getGraph()->displayFunction(item->row());
         }
         else if (item->checkState() == Qt::Unchecked)
         {
-            plotter_->hideFunction(item->row());
+            Graph::getGraph()->hideFunction(item->row());
         }
     }
 
@@ -61,7 +61,7 @@ void MainWindow::checkBoxStatusChange(const QStandardItem* const item)
 }
 
 
-void MainWindow::createButtonGroup(const QGroupBox* bg, void(MainWindow::*func)(const QString&))
+void MainWindow::createButtonGroup(const QGroupBox* bg, void (MainWindow::*func)(const QString&))
 {
     QList<QAbstractButton*> buttons = bg->findChildren<QAbstractButton*>();
 
@@ -331,5 +331,7 @@ void MainWindow::on_equalsButton_clicked()
 
     addItemToListView(expression);
 
-    plotter_->addFunction(expression.toStdString());
+    Graph::getGraph()->addFunction(expression.toStdString());
+
+    plotter_->repaint();
 }

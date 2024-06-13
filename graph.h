@@ -1,10 +1,11 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <QPointF>
 #include <vector>
 #include <string>
-#include <qcolor.h>
+#include <memory>
+#include <QColor>
+#include <QPointF>
 #include "settings.h"
 #include "parsetree.h"
 
@@ -12,6 +13,12 @@ using GraphLines = std::vector<std::pair<QColor, std::vector<QPointF>>>;
 
 class Graph
 {
+private:
+
+    Graph(const Graph&) = delete;
+
+    Graph& operator=(const Graph&) = delete;
+
 private:
 
     struct FunctionGraphic
@@ -23,17 +30,23 @@ private:
 
 public:
 
+    Graph() = default;
+
+    static std::shared_ptr<Graph> getGraph();
+
     void addFunction(const std::string&);
 
     void removeFunction();
 
-    void setChecked(int);
+    void displayFunction(int);
 
-    void setUnchecked(int);
+    void hideFunction(int);
 
     GraphLines calculateFunctions(double, double, double) const;
 
 private:
+
+    static std::shared_ptr<Graph> graph_;
 
     std::vector<FunctionGraphic> functions_;
 };

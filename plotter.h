@@ -13,12 +13,6 @@ class Plotter : public QWidget
 public:
     Plotter(QWidget* = nullptr, double = 0);
 
-    void addFunction(const std::string&);
-
-    void displayFunction(int);
-
-    void hideFunction(int);
-
 protected:
     void paintEvent(QPaintEvent*) override;
 
@@ -87,8 +81,6 @@ private:
     QColor mainAxisColor_;
     QColor auxiliaryAxisColor_;
     QColor additionalAxisColor_;
-
-    Graph graph_;
 };
 
 #endif // PLOTTER_H

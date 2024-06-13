@@ -1,5 +1,14 @@
 #include "graph.h"
 
+std::shared_ptr<Graph> Graph::graph_ = nullptr;
+
+std::shared_ptr<Graph> Graph::getGraph()
+{
+    if (graph_ == nullptr) graph_ = std::make_shared<Graph>();
+
+    return graph_;
+}
+
 void Graph::addFunction(const std::string& func)
 {
     FunctionGraphic fg;
@@ -16,7 +25,7 @@ void Graph::removeFunction()
 
 }
 
-void Graph::setChecked(int index)
+void Graph::displayFunction(int index)
 {
     if (0 <= index && index <= functions_.size())
     {
@@ -24,7 +33,7 @@ void Graph::setChecked(int index)
     }
 }
 
-void Graph::setUnchecked(int index)
+void Graph::hideFunction(int index)
 {
     if (0 <= index && index <= functions_.size())
     {

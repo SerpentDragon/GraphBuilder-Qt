@@ -32,23 +32,6 @@ Plotter::Plotter(QWidget* parent, double segmentSize) : QWidget(parent)
     }
 }
 
-void Plotter::addFunction(const std::string& function)
-{
-    graph_.addFunction(function);
-
-    this->repaint();
-}
-
-void Plotter::displayFunction(int index)
-{
-    graph_.setChecked(index);
-}
-
-void Plotter::hideFunction(int index)
-{
-    graph_.setUnchecked(index);
-}
-
 void Plotter::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
@@ -64,7 +47,7 @@ void Plotter::paintEvent(QPaintEvent *event)
 
 void Plotter::paintGraphics(QPainter& painter) const
 {
-    auto result = graph_.calculateFunctions(getLeftLimit(), getRightLimit(), coordinatesFactor_);
+    auto result = Graph::getGraph()->calculateFunctions(getLeftLimit(), getRightLimit(), coordinatesFactor_);
 
     for(const auto& function : result)
     {
