@@ -51,29 +51,36 @@ void Plotter::paintGraphics(QPainter& painter) const
 
     for(const auto& function : result)
     {
-        QColor color = function.first;
-        auto points = function.second;
+        int index = function.first;
+        QColor color = function.second.first;
+        auto points = function.second.second;
 
         painter.setPen(QPen{ color, graphLineWidth_ });
 
         for(int i = 0; i < points.size() - 1; i++)
         {
-            // qDebug() << points[i].x() << " " << points[i].y() << Qt::endl;
-            // qDebug() << points[i].y() << " " << points[i + 1].y() << Qt::endl;
-
             if (qIsNaN(points[i].y()) || qIsNaN(points[i + 1].y()) ||
                 qIsInf(points[i].y()) || qIsInf(points[i + 1].y())) continue;
 
             if (!isInsideField(points[i]) && !isInsideField(points[i + 1])) continue;
 
-            // qDebug() << points[i].y() << " " << points[i + 1].y() << Qt::endl;
-
-            // qDebug() << points[i].x() << " " << points[i].y() << Qt::endl;
-
             QPointF start = fromCartesianToWindow(points[i]);
             QPointF end = fromCartesianToWindow(points[i + 1]);
 
-            painter.drawLine(start, end);
+            if (std::abs(end.y() - start.y()) > segmentSize_ / 30)
+            {
+                auto gt = Graph::getGraph();
+                auto brokenInterval = Graph::getGraph()->calculateBrokenInterval(index, points[i].x(), points[i + 1].x());
+
+                for(int i = 0; i < brokenInterval.size(); i += 2)
+                {
+                    start = fromCartesianToWindow(brokenInterval[i]);
+                    end = fromCartesianToWindow(brokenInterval[i + 1]);
+
+                    painter.drawLine(start, end);
+                }
+            }
+            else painter.drawLine(start, end);
         }
     }
 }
