@@ -1,32 +1,48 @@
 #include "parsetree.h"
 
+// function namespaces
+
 namespace Functions
 {
-    const std::vector<std::string> functions = { "sin", "cos", "tg", "ctg", "asin", "acos", "atg",
+    const std::unordered_set<std::string> functions = { "sin", "cos", "tg", "ctg", "asin", "acos", "atg",
                                           "actg", "sinh", "cosh", "tgh", "ctgh", "ln", "lg",
                                           "log", "abs", "sqrt" };
 
-    bool isFunction(const std::string& function)
+    const std::vector<std::string> trigonometricFunctions = { "sin", "cos", "tg", "ctg", "asin", "acos", "atg",
+                                                                    "actg", "sinh", "cosh", "tgh", "ctgh" };
+
+    bool isFunction(std::string function)
     {
-        std::string func = function;
-
-        if (func[0] == '-') func = func.substr(1);
-
-        for (const auto& f : functions)
+        if (function[0] == '-')
         {
-            if (func.find(f) == 0) return true;
+            function = function.substr(1);
         }
 
-        return false;
+        function = function.substr(0, function.find('('));
+
+        return functions.contains(function);
     }
-}
+};
 
 namespace LimitFunctions
 {
-    const std::vector<std::string> limitFunctions = { "ctgh", "actg", "tg", "ctg", "/", "%" };
+    // All the functions in the app which may cause a function break
+    const std::unordered_set<std::string> limitFunctions = { "ctgh", "actg", "tg", "ctg", "/", "%" };
 };
 
-enum PRIORITY : unsigned short { SUMSUB = 1, MULDIV, POW, MID = 5, HIGHEST = 10};
+// friend function to calculate node values
+
+// double findRoots(double x, void* param)
+// {
+//     auto data = reinterpret_cast<std::pair<ParseTree*, std::shared_ptr<ParseTree::Node>>*>(param);
+
+//     ParseTree* tree = data->first;
+//     auto node = data->second;
+
+//     return tree->evalTree(node, x);
+// }
+
+// ParseTree class
 
 void ParseTree::setExpression(const std::string& func)
 {
@@ -34,9 +50,47 @@ void ParseTree::setExpression(const std::string& func)
     root_ = makeTree(expression);
 }
 
-double ParseTree::evalTree(double x) const
+double ParseTree::evalTree(double x, ANGLE angle) const
 {
-    return evalTree(root_, x);
+    return evalTree(root_, x, angle);
+}
+
+std::vector<double> ParseTree::findBreakPoints(double left, double right) const
+{
+    // auto limitFunctions = findLimitFunctions(root_);
+
+    // const gsl_root_fsolver_type *T = gsl_root_fsolver_brent;
+    // gsl_root_fsolver *s = gsl_root_fsolver_alloc(T);
+
+    std::vector<double> breakPoints;
+
+    // for(const auto& node : limitFunctions)
+    // {
+    //     auto params = std::pair(this, node);
+
+    //     gsl_function F;
+    //     F.function = &findRoots;
+    //     F.params = reinterpret_cast<void*>(&params);
+
+    //     double root;
+    //     gsl_root_fsolver_set(s, &F, left, right);
+
+    //     int status;
+    //     do
+    //     {
+    //         status = gsl_root_fsolver_iterate(s);
+    //         root = gsl_root_fsolver_root(s);
+    //         left = gsl_root_fsolver_x_lower(s);
+    //         right = gsl_root_fsolver_x_upper(s);
+    //         status = gsl_root_test_interval(left, right, 0, std::pow(10, MathParams::Precision));
+    //     } while (status == GSL_CONTINUE);
+
+    //     breakPoints.emplace_back(root);
+    // }
+
+    // gsl_root_fsolver_free(s);
+
+    return breakPoints;
 }
 
 std::shared_ptr<ParseTree::Node> ParseTree::makeTree(const std::string& expr)
@@ -96,11 +150,32 @@ std::shared_ptr<ParseTree::Node> ParseTree::makeTree(const std::string& expr)
     return std::make_shared<Node>(*node);
 }
 
-double ParseTree::evalTree(std::shared_ptr<Node> node, double x) const
+std::vector<std::shared_ptr<ParseTree::Node>> ParseTree::findLimitFunctions(std::shared_ptr<Node> node) const
 {
+    if (node == nullptr) return {};
+
+    std::vector<std::shared_ptr<ParseTree::Node>> limitFunctions;
+
+    if (LimitFunctions::limitFunctions.contains(node->data))
+    {
+        limitFunctions.emplace_back(node->right);
+    }
+
+    auto left = findLimitFunctions(node->left);
+    auto right = findLimitFunctions(node->right);
+
+    limitFunctions.insert(limitFunctions.end(), left.begin(), left.end());
+    limitFunctions.insert(limitFunctions.end(), right.begin(), right.end());
+
+    return limitFunctions;
+}
+
+double ParseTree::evalTree(std::shared_ptr<Node> node, double x, ANGLE angle) const
+{
+    std::string expr = node->data;
+
     if (node->right == nullptr)
     {
-        std::string expr = node->data;
         int mul = expr[0] == '-' ? -1 : 1;
 
         if (expr.contains('e')) return mul * std::numbers::e;
@@ -110,32 +185,41 @@ double ParseTree::evalTree(std::shared_ptr<Node> node, double x) const
     }
     else
     {
-        double left = node->left == nullptr ? 0 : evalTree(node->left, x);
-        double right = evalTree(node->right, x);
+        double left = node->left == nullptr ? 0 : evalTree(node->left, x, angle);
+        double right = evalTree(node->right, x, angle);
 
-        if (node->data == "+") return left + right;
-        else if (node->data == "-") return node->right == nullptr ? -left : left - right;
-        else if (node->data == "*") return left * right;
-        else if (node->data == "/") return left / right;
-        else if (node->data == "%") return fmod(left, right);
-        else if (node->data == "^") return powf(left, right);
-        else if (node->data == "sin") return sin(right);
-        else if (node->data == "cos") return cos(right);
-        else if (node->data == "tg") return tan(right);
-        else if (node->data == "ctg") return 1 / tan(right);
-        else if (node->data == "asin") return asin(right);
-        else if (node->data == "acos") return acos(right);
-        else if (node->data == "atg") return atan(right);
-        else if (node->data == "actg") return atan(1 / right);
-        else if (node->data == "sinh") return sinh(right);
-        else if (node->data == "cosh") return cosh(right);
-        else if (node->data == "tgh") return tanh(right);
-        else if (node->data == "ctgh") return 1 / tanh(right);
-        else if (node->data == "ln") return log(right);
-        else if (node->data == "lg") return log10(right);
-        else if (node->data == "log") return log(left) / log(right);
-        else if (node->data == "abs") return fabs(right);
-        else if (node->data == "sqrt") return sqrt(right);
+        if (angle == ANGLE::DEGREES)
+        {
+            if (std::any_of(Functions::trigonometricFunctions.begin(),
+                            Functions::trigonometricFunctions.end(), [&expr](const std::string& func) { return expr.contains(func); }))
+            {
+                right = right * 180 / std::numbers::pi;
+            }
+        }
+
+        if (expr == "+") return left + right;
+        else if (expr == "-") return node->right == nullptr ? -left : left - right;
+        else if (expr == "*") return left * right;
+        else if (expr == "/") return left / right;
+        else if (expr == "%") return fmod(left, right);
+        else if (expr == "^") return powf(left, right);
+        else if (expr == "sin") return sin(right);
+        else if (expr == "cos") return cos(right);
+        else if (expr == "tg") return tan(right);
+        else if (expr == "ctg") return 1 / tan(right);
+        else if (expr == "asin") return asin(right);
+        else if (expr == "acos") return acos(right);
+        else if (expr == "atg") return atan(right);
+        else if (expr == "actg") return atan(1 / right);
+        else if (expr == "sinh") return sinh(right);
+        else if (expr == "cosh") return cosh(right);
+        else if (expr == "tgh") return tanh(right);
+        else if (expr == "ctgh") return 1 / tanh(right);
+        else if (expr == "ln") return log(right);
+        else if (expr == "lg") return log10(right);
+        else if (expr == "log") return log(left) / log(right);
+        else if (expr == "abs") return fabs(right);
+        else if (expr == "sqrt") return sqrt(right);
         else return 0;
     }
 }
@@ -206,3 +290,4 @@ PRIORITY ParseTree::priority(char op)
     default: return PRIORITY::HIGHEST;
     }
 }
+

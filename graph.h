@@ -24,6 +24,7 @@ private:
     struct FunctionGraphic
     {
         ParseTree parseTree_;
+        ANGLE angle;
         bool isDrawable_;
         QColor color_;
     };
@@ -34,7 +35,7 @@ public:
 
     static std::shared_ptr<Graph> getGraph();
 
-    void addFunction(const std::string&);
+    void addFunction(const std::string&, ANGLE angle);
 
     void removeFunction();
 

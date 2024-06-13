@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     createButtonGroup(ui->functionGroupBox, &MainWindow::setFunction);
     createButtonGroup(ui->constGroupBox, &MainWindow::setConst);
 
-    ui->radianRadioButton->setChecked(true);
+    ui->radiansRadioButton->setChecked(true);
     
     plotter_ = new Plotter(ui->widget, WidgetParams::plotterSegmentSize);
 
@@ -331,7 +331,8 @@ void MainWindow::on_equalsButton_clicked()
 
     addItemToListView(expression);
 
-    Graph::getGraph()->addFunction(expression.toStdString());
+    Graph::getGraph()->addFunction(expression.toStdString(),
+                                   ui->radiansRadioButton->isChecked() ? ANGLE::RADIANS : ANGLE::DEGREES);
 
     plotter_->repaint();
 }

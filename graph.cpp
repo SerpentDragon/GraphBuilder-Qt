@@ -9,10 +9,12 @@ std::shared_ptr<Graph> Graph::getGraph()
     return graph_;
 }
 
-void Graph::addFunction(const std::string& func)
+void Graph::addFunction(const std::string& func, ANGLE angle)
 {
     FunctionGraphic fg;
     fg.parseTree_.setExpression(func);
+
+    fg.angle = angle;
 
     fg.isDrawable_ = true;
     fg.color_ = QColor(rand() % 101 + 100, rand() % 101 + 100, rand() % 101 + 100);
@@ -63,7 +65,7 @@ GraphLines Graph::calculateFunctions(double left, double right, double coordinat
         for(double value = left; value <= right; value += step)
         {
             point.setX(value);
-            point.setY(functions_[i].parseTree_.evalTree(value));
+            point.setY(functions_[i].parseTree_.evalTree(value, functions_[i].angle));
 
             functionValues.emplace_back(point);
         }

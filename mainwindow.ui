@@ -345,7 +345,7 @@
     <property name="title">
      <string/>
     </property>
-    <widget class="QRadioButton" name="radianRadioButton">
+    <widget class="QRadioButton" name="radiansRadioButton">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -370,7 +370,7 @@
       <string>Radians</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="degreeRadioButton">
+    <widget class="QRadioButton" name="degreesRadioButton">
      <property name="geometry">
       <rect>
        <x>105</x>
