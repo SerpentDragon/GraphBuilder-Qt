@@ -292,10 +292,6 @@ void MainWindow::on_modButton_clicked()
 void MainWindow::on_equalsButton_clicked()
 {
     QString expression = ui->expressionLabel->text();
-    // expression = "x^2-abs(x+1)/(x+1)-1";
-    // expression = "(x^2-5*x+4)/(x^2+7/x-12)";
-    // expression = "(x-3)/ctgh(x)";
-    // expression = "ctg(x)";
 
     if (expression.size() == 0) return;
 
