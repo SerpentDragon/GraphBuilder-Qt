@@ -9,7 +9,7 @@ namespace Functions
                                           "log", "abs", "sqrt" };
 
     const std::vector<std::string> trigonometricFunctions = { "sin", "cos", "tg", "ctg", "asin", "acos", "atg",
-                                                                    "actg", "sinh", "cosh", "tgh", "ctgh" };
+                                                            "actg", "sinh", "cosh", "tgh", "ctgh" };
 
     bool isFunction(std::string function)
     {
@@ -30,17 +30,17 @@ namespace LimitFunctions
     const std::unordered_set<std::string> limitFunctions = { "ctgh", "actg", "tg", "ctg", "/", "%" };
 };
 
-// friend function to calculate node values
+// function to calculate roots
 
-// double findRoots(double x, void* param)
-// {
-//     auto data = reinterpret_cast<std::pair<ParseTree*, std::shared_ptr<ParseTree::Node>>*>(param);
+double findRoots(double x, void* param)
+{
+    auto data = reinterpret_cast<std::tuple<ParseTree::NodePtr, ParseTree, ANGLE>*>(param);
 
-//     ParseTree* tree = data->first;
-//     auto node = data->second;
+    auto node = std::get<0>(*data);
+    ANGLE angle = std::get<2>(*data);
 
-//     return tree->evalTree(node, x);
-// }
+    return std::get<1>(*data).evalTree(node, x, angle);
+}
 
 // ParseTree class
 
@@ -53,121 +53,6 @@ void ParseTree::setExpression(const std::string& func)
 double ParseTree::evalTree(double x, ANGLE angle) const
 {
     return evalTree(root_, x, angle);
-}
-
-std::vector<double> ParseTree::findBreakPoints(double left, double right) const
-{
-    // auto limitFunctions = findLimitFunctions(root_);
-
-    // const gsl_root_fsolver_type *T = gsl_root_fsolver_brent;
-    // gsl_root_fsolver *s = gsl_root_fsolver_alloc(T);
-
-    std::vector<double> breakPoints;
-
-    // for(const auto& node : limitFunctions)
-    // {
-    //     auto params = std::pair(this, node);
-
-    //     gsl_function F;
-    //     F.function = &findRoots;
-    //     F.params = reinterpret_cast<void*>(&params);
-
-    //     double root;
-    //     gsl_root_fsolver_set(s, &F, left, right);
-
-    //     int status;
-    //     do
-    //     {
-    //         status = gsl_root_fsolver_iterate(s);
-    //         root = gsl_root_fsolver_root(s);
-    //         left = gsl_root_fsolver_x_lower(s);
-    //         right = gsl_root_fsolver_x_upper(s);
-    //         status = gsl_root_test_interval(left, right, 0, std::pow(10, MathParams::Precision));
-    //     } while (status == GSL_CONTINUE);
-
-    //     breakPoints.emplace_back(root);
-    // }
-
-    // gsl_root_fsolver_free(s);
-
-    return breakPoints;
-}
-
-std::shared_ptr<ParseTree::Node> ParseTree::makeTree(const std::string& expr)
-{
-    Node* node = new Node();
-
-    int index = lastOp(expr);
-
-    if (index == -1 || index == 0)
-    {
-        if (Functions::isFunction(expr))
-        {
-            if (index == 0)
-            {
-                node->data = "-";
-                node->left = nullptr;
-                node->right = makeTree(expr.substr(1));
-            }
-            else
-            {
-                node->data = expr.substr(0, expr.find('('));
-
-                if (node->data == "log")
-                {
-                    std::string arg1 = checkBrackets(expr.substr(expr.find('(') + 1, expr.find(',') - expr.find('(')));
-                    std::string arg2 = checkBrackets(expr.substr(expr.find(',') + 1, expr.size() - 2 - expr.find(',')));
-
-                    node->left = makeTree(arg1);
-                    node->right = makeTree(arg2);
-                }
-                else
-                {
-                    std::string arg = checkBrackets(expr.substr(expr.find('(') + 1, expr.size() - 2 - expr.find('(')));
-
-                    node->left = nullptr;
-                    node->right = makeTree(arg);
-                }
-            }
-        }
-        else
-        {
-            node->data = expr;
-            node->left = nullptr;
-            node->right = nullptr;
-        }
-    }
-    else
-    {
-        std::string leftTree = checkBrackets(expr.substr(0, index));
-        std::string rightTree = checkBrackets(expr.substr(index + 1, expr.size() - 1 - index));
-
-        node->data = expr[index];
-        node->left = makeTree(leftTree);
-        node->right = makeTree(rightTree);
-    }
-
-    return std::make_shared<Node>(*node);
-}
-
-std::vector<std::shared_ptr<ParseTree::Node>> ParseTree::findLimitFunctions(std::shared_ptr<Node> node) const
-{
-    if (node == nullptr) return {};
-
-    std::vector<std::shared_ptr<ParseTree::Node>> limitFunctions;
-
-    if (LimitFunctions::limitFunctions.contains(node->data))
-    {
-        limitFunctions.emplace_back(node->right);
-    }
-
-    auto left = findLimitFunctions(node->left);
-    auto right = findLimitFunctions(node->right);
-
-    limitFunctions.insert(limitFunctions.end(), left.begin(), left.end());
-    limitFunctions.insert(limitFunctions.end(), right.begin(), right.end());
-
-    return limitFunctions;
 }
 
 double ParseTree::evalTree(std::shared_ptr<Node> node, double x, ANGLE angle) const
@@ -222,6 +107,68 @@ double ParseTree::evalTree(std::shared_ptr<Node> node, double x, ANGLE angle) co
         else if (expr == "sqrt") return sqrt(right);
         else return 0;
     }
+}
+
+std::vector<ParseTree::NodePtr> ParseTree::findLimitFunctions() const
+{
+    return findLimitFunctions(root_);
+}
+
+ParseTree::NodePtr ParseTree::makeTree(const std::string& expr)
+{
+    Node* node = new Node();
+
+    int index = lastOp(expr);
+
+    if (index == -1 || index == 0)
+    {
+        if (Functions::isFunction(expr))
+        {
+            if (index == 0)
+            {
+                node->data = "-";
+                node->left = nullptr;
+                node->right = makeTree(expr.substr(1));
+            }
+            else
+            {
+                node->data = expr.substr(0, expr.find('('));
+
+                if (node->data == "log")
+                {
+                    std::string arg1 = checkBrackets(expr.substr(expr.find('(') + 1, expr.find(',') - expr.find('(')));
+                    std::string arg2 = checkBrackets(expr.substr(expr.find(',') + 1, expr.size() - 2 - expr.find(',')));
+
+                    node->left = makeTree(arg1);
+                    node->right = makeTree(arg2);
+                }
+                else
+                {
+                    std::string arg = checkBrackets(expr.substr(expr.find('(') + 1, expr.size() - 2 - expr.find('(')));
+
+                    node->left = nullptr;
+                    node->right = makeTree(arg);
+                }
+            }
+        }
+        else
+        {
+            node->data = expr;
+            node->left = nullptr;
+            node->right = nullptr;
+        }
+    }
+    else
+    {
+        std::string leftTree = checkBrackets(expr.substr(0, index));
+        std::string rightTree = checkBrackets(expr.substr(index + 1, expr.size() - 1 - index));
+
+        node->data = expr[index];
+        node->left = makeTree(leftTree);
+        node->right = makeTree(rightTree);
+    }
+
+    return std::make_shared<Node>(*node);
 }
 
 std::string ParseTree::checkBrackets(const std::string& expr)
@@ -291,3 +238,22 @@ PRIORITY ParseTree::priority(char op)
     }
 }
 
+std::vector<ParseTree::NodePtr> ParseTree::findLimitFunctions(NodePtr node) const
+{
+    if (node == nullptr) return {};
+
+    std::vector<ParseTree::NodePtr> limitFunctions;
+
+    if (LimitFunctions::limitFunctions.contains(node->data))
+    {
+        limitFunctions.emplace_back(node->right);
+    }
+
+    auto left = findLimitFunctions(node->left);
+    auto right = findLimitFunctions(node->right);
+
+    limitFunctions.insert(limitFunctions.end(), left.begin(), left.end());
+    limitFunctions.insert(limitFunctions.end(), right.begin(), right.end());
+
+    return limitFunctions;
+}

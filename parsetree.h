@@ -8,10 +8,8 @@
 #include <numbers>
 #include "settings.h"
 #include <unordered_set>
-#include <gsl/gsl_roots.h>
-#include <gsl/gsl_errno.h>
 
-// double findRoots(double, void*);
+double findRoots(double, void*);
 
 enum PRIORITY : unsigned short { SUMSUB = 1, MULDIV, POW, MID = 5, HIGHEST = 10};
 
@@ -19,14 +17,6 @@ enum class ANGLE : unsigned short { RADIANS = 0, DEGREES };
 
 class ParseTree
 {
-public:
-
-    void setExpression(const std::string&);
-
-    double evalTree(double, ANGLE) const;
-
-    std::vector<double> findBreakPoints(double, double) const;
-
 private:
 
     struct Node
@@ -36,13 +26,23 @@ private:
         std::string data;
     };
 
+    using NodePtr = std::shared_ptr<Node>;
+
+    friend double findRoots(double, void*);
+
+public:
+
+    void setExpression(const std::string&);
+
+    double evalTree(double, ANGLE) const;
+
+    double evalTree(NodePtr, double, ANGLE) const;
+
+    std::vector<NodePtr> findLimitFunctions() const;
+
 private:
 
-    std::shared_ptr<Node> makeTree(const std::string&);
-
-    std::vector<std::shared_ptr<ParseTree::Node>> findLimitFunctions(std::shared_ptr<Node>) const;
-
-    double evalTree(std::shared_ptr<Node>, double, ANGLE angle) const;
+    NodePtr makeTree(const std::string&);
 
     std::string checkBrackets(const std::string&);
 
@@ -50,11 +50,11 @@ private:
 
     PRIORITY priority(char);
 
-    friend double findRoots(double, void*);
+    std::vector<NodePtr> findLimitFunctions(NodePtr) const;
 
 private:
 
-    std::shared_ptr<Node> root_;
+    NodePtr root_;
 };
 
 #endif // PARSETREE_H
