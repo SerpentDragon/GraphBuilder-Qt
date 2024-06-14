@@ -1,6 +1,6 @@
 #include "listviewitem.h"
 
-ListViewItem::ListViewItem(const QString &text, QWidget *parent) : QWidget(parent),
+ListViewItem::ListViewItem(const QString &text, QModelIndex rowIndex, QWidget *parent) : QWidget(parent),
     parent_(parent), width_(parent->size().width()), height_(LVI::Height)
 {
     checkBox_ = new QCheckBox(this);
@@ -13,12 +13,31 @@ ListViewItem::ListViewItem(const QString &text, QWidget *parent) : QWidget(paren
 
     this->setLayout(setupLayout());
     this->setMinimumSize(width_, height_);
+
+    rowIndex_ = rowIndex;
+}
+
+QModelIndex ListViewItem::getRowIndex() const
+{
+    return rowIndex_;
+}
+
+void ListViewItem::onCheckBoxStatedChanged(int state)
+{
+    emit checkBoxStateChanged(rowIndex_, state);
+}
+
+void ListViewItem::onButtonClicked()
+{
+    emit buttonClicked(rowIndex_);
 }
 
 void ListViewItem::setupCheckBox()
 {
     checkBox_->setCheckState(Qt::Checked);
     checkBox_->setFixedSize(LVI::CheckBoxSize, LVI::CheckBoxSize);
+
+    connect(checkBox_, &QCheckBox::stateChanged, this, &ListViewItem::onCheckBoxStatedChanged);
 }
 
 void ListViewItem::setupTextEdit()
@@ -36,6 +55,10 @@ void ListViewItem::setupTextEdit()
 void ListViewItem::setupButton()
 {
     button_->setFixedSize(LVI::ButtonSize, LVI::ButtonSize);
+    button_->setIcon(QIcon::fromTheme("edit-clear"));
+    button_->setIconSize(button_->size());
+
+    connect(button_, &QPushButton::clicked, this, &ListViewItem::onButtonClicked);
 }
 
 QHBoxLayout* ListViewItem::setupLayout()

@@ -13,8 +13,8 @@ namespace WidgetParams
     namespace ListViewItem
     {
         constexpr int Height = 45;
-        constexpr int CheckBoxSize = Height / 4;
-        constexpr int ButtonSize = Height / 4;
+        constexpr int CheckBoxSize = Height / 3;
+        constexpr int ButtonSize = Height / 3;
         constexpr int MarginValue = 2;
     }
 };

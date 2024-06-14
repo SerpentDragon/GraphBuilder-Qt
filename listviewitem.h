@@ -13,9 +13,25 @@ namespace LVI = WidgetParams::ListViewItem;
 
 class ListViewItem : public QWidget
 {
+    Q_OBJECT
+
 public:
 
-    explicit ListViewItem(const QString&, QWidget* = nullptr);
+    explicit ListViewItem(const QString&, QModelIndex, QWidget* = nullptr);
+
+    QModelIndex getRowIndex() const;
+
+signals:
+
+    void checkBoxStateChanged(QModelIndex, int);
+
+    void buttonClicked(QModelIndex);
+
+private slots:
+
+    void onCheckBoxStatedChanged(int);
+
+    void onButtonClicked();
 
 private:
 
@@ -33,6 +49,8 @@ private:
 
     int width_;
     int height_;
+
+    QModelIndex rowIndex_;
 
     QCheckBox* checkBox_;
     QTextEdit* textEdit_;
