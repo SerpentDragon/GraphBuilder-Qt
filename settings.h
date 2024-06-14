@@ -5,8 +5,18 @@
 
 namespace WidgetParams
 {
-    constexpr int plotterSegmentSize = 60;
-    constexpr int listViewItemHeight = 30;
+    namespace Plotter
+    {
+        constexpr int SegmentSize = 60;
+    };
+
+    namespace ListViewItem
+    {
+        constexpr int Height = 45;
+        constexpr int CheckBoxSize = Height / 4;
+        constexpr int ButtonSize = Height / 4;
+        constexpr int MarginValue = 2;
+    }
 };
 
 namespace AllowedSymbols
