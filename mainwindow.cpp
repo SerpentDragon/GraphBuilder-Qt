@@ -16,10 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->radiansRadioButton->setChecked(true);
     
-    plotter_ = new Plotter(ui->widget, WidgetParams::plotterSegmentSize);
+    plotter_ = new Plotter(ui->widget, WidgetParams::Plotter::SegmentSize);
 
     itemModel_ = new QStandardItemModel(this);
-    connect(itemModel_, &QStandardItemModel::itemChanged, this, &MainWindow::checkBoxStatusChange);
 }
 
 
@@ -31,15 +30,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::addItemToListView(const QString& function)
 {
-    QStandardItem* item = new QStandardItem(function);
-    item->setCheckable(true);
-    item->setCheckState(Qt::Checked);
-    item->setEditable(false);
-    item->setSizeHint(QSize(item->sizeHint().rwidth(), WidgetParams::listViewItemHeight));
+    QStandardItem* item = new QStandardItem();
+    ListViewItem* listViewItem = new ListViewItem(function, ui->listView);
+
+    item->setSizeHint({ ui->listView->size().width(), WidgetParams::ListViewItem::Height });
 
     itemModel_->appendRow(item);
-
     ui->listView->setModel(itemModel_);
+    ui->listView->setIndexWidget(item->index(), listViewItem);
 }
 
 
@@ -294,6 +292,8 @@ void MainWindow::on_equalsButton_clicked()
     QString expression = ui->expressionLabel->text();
 
     if (expression.size() == 0) return;
+
+    expression = "sin(sin(sin(sin(sin(sin(sin(sin(sin(sin(x))))))))))";
 
     std::stack<QChar> stk;
     for(const QChar c : expression)

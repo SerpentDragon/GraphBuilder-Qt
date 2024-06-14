@@ -10,6 +10,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QButtonGroup>
+#include "listviewitem.h"
 #include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
