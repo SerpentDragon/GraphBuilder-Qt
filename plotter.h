@@ -11,7 +11,7 @@
 class Plotter : public QWidget
 {
 public:
-    Plotter(QWidget* = nullptr, double = 0);
+    explicit Plotter(QWidget* = nullptr, double = 0);
 
 protected:
     void paintEvent(QPaintEvent*) override;

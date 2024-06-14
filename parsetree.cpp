@@ -26,7 +26,7 @@ namespace Functions
 
 namespace LimitFunctions
 {
-    // All the functions in the app which may cause a function break
+    // All the functions in the app which may cause a function rupture
     const std::unordered_set<std::string> limitFunctions = { "ctgh", "actg", "tg", "ctg", "/", "%" };
 };
 
