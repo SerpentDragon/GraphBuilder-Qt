@@ -1,6 +1,6 @@
 #include "listviewitem.h"
 
-ListViewItem::ListViewItem(const QString &text, QModelIndex rowIndex, QWidget *parent) : QWidget(parent),
+ListViewItem::ListViewItem(const QString &text, QWidget *parent) : QWidget(parent),
     parent_(parent), width_(parent->size().width()), height_(LVI::Height)
 {
     checkBox_ = new QCheckBox(this);
@@ -13,23 +13,16 @@ ListViewItem::ListViewItem(const QString &text, QModelIndex rowIndex, QWidget *p
 
     this->setLayout(setupLayout());
     this->setMinimumSize(width_, height_);
-
-    rowIndex_ = rowIndex;
-}
-
-QModelIndex ListViewItem::getRowIndex() const
-{
-    return rowIndex_;
 }
 
 void ListViewItem::onCheckBoxStatedChanged(int state)
 {
-    emit checkBoxStateChanged(rowIndex_, state);
+    emit checkBoxStateChanged(this, state);
 }
 
 void ListViewItem::onButtonClicked()
 {
-    emit buttonClicked(rowIndex_);
+    emit buttonClicked(this);
 }
 
 void ListViewItem::setupCheckBox()

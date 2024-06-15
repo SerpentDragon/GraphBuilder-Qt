@@ -17,15 +17,13 @@ class ListViewItem : public QWidget
 
 public:
 
-    explicit ListViewItem(const QString&, QModelIndex, QWidget* = nullptr);
-
-    QModelIndex getRowIndex() const;
+    explicit ListViewItem(const QString&, QWidget* = nullptr);
 
 signals:
 
-    void checkBoxStateChanged(QModelIndex, int);
+    void checkBoxStateChanged(ListViewItem*, int);
 
-    void buttonClicked(QModelIndex);
+    void buttonClicked(ListViewItem*);
 
 private slots:
 
@@ -49,8 +47,6 @@ private:
 
     int width_;
     int height_;
-
-    QModelIndex rowIndex_;
 
     QCheckBox* checkBox_;
     QTextEdit* textEdit_;
