@@ -365,3 +365,26 @@ void MainWindow::on_equalsButton_clicked()
 
     plotter_->repaint();
 }
+
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    auto reply = QMessageBox::question(this, "Exit confirmation",
+                                       "Are you shure you want to close the app?",
+                                       QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) this->close();
+    else event->ignore();
+}
+
+
+void MainWindow::on_actionAbout_Developer_triggered()
+{
+
+}
+
+
+void MainWindow::on_actionAbout_Programm_triggered()
+{
+
+}

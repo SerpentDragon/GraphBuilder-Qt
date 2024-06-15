@@ -49,6 +49,9 @@ private:
 
     void setConst(const QString&);
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 public:
     MainWindow(QWidget *parent = nullptr);
 
@@ -72,6 +75,10 @@ private slots:
     void on_modButton_clicked();
 
     void on_equalsButton_clicked();
+
+    void on_actionAbout_Developer_triggered();
+
+    void on_actionAbout_Programm_triggered();
 
 private:
     Ui::MainWindow* ui;
