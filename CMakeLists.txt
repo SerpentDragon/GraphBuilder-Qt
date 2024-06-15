@@ -20,6 +20,9 @@ set(SOURCE_CONTROLLER
     src/Controller/mainwindow.h
     src/Controller/mainwindow.ui
     src/Controller/settings.h
+    src/Controller/aboutdeveloper.h
+    src/Controller/aboutdeveloper.cpp
+    src/Controller/aboutdeveloper.ui
 )
 
 set(SOURCE_MODEL
@@ -60,6 +63,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${SOURCE_VIEW}
         ${SOURCE_MAIN}
         ${RESOURCES}
+
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET GraphBuilder APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

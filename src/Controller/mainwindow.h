@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QButtonGroup>
 #include "listviewitem.h"
+#include "aboutdeveloper.h"
 #include "../View/plotter.h"
 #include <QStandardItemModel>
 
@@ -82,6 +83,8 @@ private slots:
 
 private:
     Ui::MainWindow* ui;
+
+    AboutDeveloper* aboutDeveloper_;
 
     Plotter* plotter_;
 

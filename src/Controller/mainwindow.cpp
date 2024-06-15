@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
 
+    aboutDeveloper_ = new AboutDeveloper(this);
+
     createButtonGroup(ui->digitGroupBox, &MainWindow::setDigit);
     createButtonGroup(ui->operationGroupBox, &MainWindow::setOperation);
     createButtonGroup(ui->functionGroupBox, &MainWindow::setFunction);
@@ -386,5 +388,5 @@ void MainWindow::on_actionAbout_Developer_triggered()
 
 void MainWindow::on_actionAbout_Programm_triggered()
 {
-
+    aboutDeveloper_->exec();
 }
