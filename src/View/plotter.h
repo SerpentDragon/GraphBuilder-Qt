@@ -4,9 +4,9 @@
 #include <thread>
 #include <QWidget>
 #include <QLayout>
-#include "graph.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include "../Model/graph.h"
 
 class Plotter : public QWidget
 {

@@ -4,7 +4,6 @@
 #include <stack>
 #include <QLayout>
 #include <optional>
-#include "plotter.h"
 #include <QGroupBox>
 #include "settings.h"
 #include <QListWidget>
@@ -12,6 +11,7 @@
 #include <QMessageBox>
 #include <QButtonGroup>
 #include "listviewitem.h"
+#include "../View/plotter.h"
 #include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE

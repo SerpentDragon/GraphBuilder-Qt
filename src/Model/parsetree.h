@@ -6,8 +6,8 @@
 #include <memory>
 #include <vector>
 #include <numbers>
-#include "settings.h"
 #include <unordered_set>
+#include "../Controller/settings.h"
 
 double findRoots(double, void*);
 

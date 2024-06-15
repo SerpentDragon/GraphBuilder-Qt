@@ -13,11 +13,41 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(GSL REQUIRED)
 
-set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+set(SOURCE_CONTROLLER
+    src/Controller/listviewitem.cpp
+    src/Controller/listviewitem.h
+    src/Controller/mainwindow.cpp
+    src/Controller/mainwindow.h
+    src/Controller/mainwindow.ui
+    src/Controller/settings.h
+)
+
+set(SOURCE_MODEL
+    src/Model/graph.cpp
+    src/Model/graph.h
+    src/Model/parsetree.cpp
+    src/Model/parsetree.h
+)
+
+set(SOURCE_VIEW
+    src/View/plotter.cpp
+    src/View/plotter.h
+)
+
+set(SOURCE_MAIN
+    src/main.cpp
+)
+
+set(RESOURCES
+    resources/resource.qrc
+    resources/images/abs.png
+    resources/images/delete.png
+    resources/images/div.png
+    resources/images/exp.png
+    resources/images/mul.png
+    resources/images/pi.png
+    resources/images/pow.png
+    resources/images/sqrt.png
 )
 
 qt_add_resources(RESOURCE_FILES resources.qrc)
@@ -25,14 +55,11 @@ qt_add_resources(RESOURCE_FILES resources.qrc)
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(GraphBuilder
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        plotter.h plotter.cpp
-        parsetree.h parsetree.cpp
-        images/abs.png images/delete.png images/div.png images/exp.png images/mul.png images/pi.png images/pow.png images/sqrt.png
-        resource.qrc
-        graph.h graph.cpp
-        settings.h
-        listviewitem.h listviewitem.cpp
+        ${SOURCE_CONTROLLER}
+        ${SOURCE_MODEL}
+        ${SOURCE_VIEW}
+        ${SOURCE_MAIN}
+        ${RESOURCES}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET GraphBuilder APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

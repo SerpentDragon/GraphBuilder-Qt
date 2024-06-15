@@ -7,11 +7,11 @@
 #include <memory>
 #include <QColor>
 #include <QPointF>
-#include "settings.h"
 #include "parsetree.h"
 #include <unordered_map>
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_errno.h>
+#include "../Controller/settings.h"
 
 using GraphLines = std::unordered_map<int, std::pair<QColor, std::vector<QPointF>>>;
 
