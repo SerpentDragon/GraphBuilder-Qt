@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <QLayout>
+#include <optional>
 #include "plotter.h"
 #include <QGroupBox>
 #include "settings.h"
@@ -26,7 +27,11 @@ class MainWindow : public QMainWindow
 private:
     void addItemToListView(const QString&);
 
-    void checkBoxStatusChange(const QStandardItem* const );
+    void displayOrHideFunction(ListViewItem*, int);
+
+    void removeFunction(ListViewItem*);
+
+    std::optional<int> getListViewItemRow(ListViewItem*) const;
 
     void createButtonGroup(const QGroupBox*, void(MainWindow::*)(const QString&));
 

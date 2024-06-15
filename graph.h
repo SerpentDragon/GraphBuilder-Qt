@@ -43,7 +43,7 @@ public:
 
     void addFunction(const std::string&, ANGLE angle);
 
-    void removeFunction();
+    void removeFunction(int);
 
     void displayFunction(int);
 

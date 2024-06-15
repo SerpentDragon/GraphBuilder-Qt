@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     plotter_ = new Plotter(ui->widget, WidgetParams::Plotter::SegmentSize);
 
     itemModel_ = new QStandardItemModel(this);
+    ui->listView->setModel(itemModel_);
 }
 
 
@@ -31,31 +32,64 @@ MainWindow::~MainWindow()
 void MainWindow::addItemToListView(const QString& function)
 {
     QStandardItem* item = new QStandardItem();
-    ListViewItem* listViewItem = new ListViewItem(function, ui->listView);
-
     item->setSizeHint({ ui->listView->size().width(), WidgetParams::ListViewItem::Height });
-
     itemModel_->appendRow(item);
-    ui->listView->setModel(itemModel_);
+
+    ListViewItem* listViewItem = new ListViewItem(function, ui->listView);
+    connect(listViewItem, &ListViewItem::checkBoxStateChanged, this, &MainWindow::displayOrHideFunction);
+    connect(listViewItem, &ListViewItem::buttonClicked, this, &MainWindow::removeFunction);
+
     ui->listView->setIndexWidget(item->index(), listViewItem);
 }
 
 
-void MainWindow::checkBoxStatusChange(const QStandardItem* const item)
+void MainWindow::displayOrHideFunction(ListViewItem* item, int state)
 {
-    if (item->isCheckable())
+    auto result = getListViewItemRow(item);
+    if (!result.has_value()) return;
+
+    int row = result.value();
+
+    if (state == Qt::Checked)
     {
-        if (item->checkState() == Qt::Checked)
-        {
-            Graph::getGraph()->displayFunction(item->row());
-        }
-        else if (item->checkState() == Qt::Unchecked)
-        {
-            Graph::getGraph()->hideFunction(item->row());
-        }
+        Graph::getGraph()->displayFunction(row);
+    }
+    else if (state == Qt::Unchecked)
+    {
+        Graph::getGraph()->hideFunction(row);
     }
 
     plotter_->repaint();
+}
+
+
+void MainWindow::removeFunction(ListViewItem* item)
+{
+    auto result = getListViewItemRow(item);
+    if (!result.has_value()) return;
+
+    int row = result.value();
+
+    Graph::getGraph()->removeFunction(row);
+
+    itemModel_->removeRow(row);
+
+    plotter_->repaint();
+}
+
+std::optional<int> MainWindow::getListViewItemRow(ListViewItem* item) const
+{
+    for(int row = 0; row < itemModel_->rowCount(); row++)
+    {
+        QModelIndex index = itemModel_->index(row, 0);
+
+        if (ui->listView->indexWidget(index) == item)
+        {
+            return row;
+        }
+    }
+
+    return std::nullopt;
 }
 
 
@@ -292,8 +326,6 @@ void MainWindow::on_equalsButton_clicked()
     QString expression = ui->expressionLabel->text();
 
     if (expression.size() == 0) return;
-
-    expression = "sin(sin(sin(sin(sin(sin(sin(sin(sin(sin(x))))))))))";
 
     std::stack<QChar> stk;
     for(const QChar c : expression)

@@ -22,9 +22,12 @@ void Graph::addFunction(const std::string& func, ANGLE angle)
     functions_.emplace_back(fg);
 }
 
-void Graph::removeFunction()
+void Graph::removeFunction(int index)
 {
-
+    if (0 <= index && index <= functions_.size())
+    {
+        functions_.erase(functions_.begin() + index);
+    }
 }
 
 void Graph::displayFunction(int index)
