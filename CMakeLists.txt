@@ -63,6 +63,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${SOURCE_VIEW}
         ${SOURCE_MAIN}
         ${RESOURCES}
+        README.md
 
 
     )
