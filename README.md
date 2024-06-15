@@ -11,7 +11,7 @@ You can manipulate functions displaying. To show/hide the graph you should
 check/uncheck the combobox of the corresponding function in the list. You can also 
 delete the function by clicking the button with red cross.  
 
-<b>Maintained functions:</b>
+<b>Functions maintained:</b>
 - sin(x)
 - cos(x)
 - tg(x)
