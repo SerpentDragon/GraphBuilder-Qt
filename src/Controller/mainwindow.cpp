@@ -380,7 +380,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::on_actionAbout_Developer_triggered()
 {
-
+    QMessageBox::information(this, "About Developer", "This programm was developed by SerpentDragon (dmitryshelyganov@gmail.com)", QMessageBox::Ok);
 }
 
 
