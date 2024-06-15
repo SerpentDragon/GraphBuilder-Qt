@@ -77,6 +77,7 @@ void MainWindow::removeFunction(ListViewItem* item)
     plotter_->repaint();
 }
 
+
 std::optional<int> MainWindow::getListViewItemRow(ListViewItem* item) const
 {
     for(int row = 0; row < itemModel_->rowCount(); row++)
