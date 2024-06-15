@@ -10,6 +10,8 @@
 
 class Plotter : public QWidget
 {
+    Q_OBJECT
+
 public:
     explicit Plotter(QWidget* = nullptr, double = 0);
 
