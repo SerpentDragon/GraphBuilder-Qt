@@ -29,8 +29,6 @@ private:
     
     Graph& operator=(Graph&&) noexcept = delete;
 
-    ~Graph() = default;
-
     std::vector<double> findRupturePoints(int, double, double) const;
 
 private:

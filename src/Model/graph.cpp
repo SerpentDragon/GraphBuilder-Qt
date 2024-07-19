@@ -4,7 +4,7 @@ std::shared_ptr<Graph> Graph::graph_ = nullptr;
 
 std::shared_ptr<Graph> Graph::getGraph()
 {
-    if (graph_ == nullptr) graph_ = std::make_shared<Graph>();
+    if (graph_ == nullptr) graph_ = std::shared_ptr<Graph>(new Graph());
 
     return graph_;
 }
