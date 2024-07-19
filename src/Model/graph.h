@@ -19,10 +19,18 @@ class Graph
 {
 private:
 
+    Graph() = default;
+
     Graph(const Graph&) = delete;
+
+    Graph(Graph&&) noexcept = delete;
 
     Graph& operator=(const Graph&) = delete;
     
+    Graph& operator=(Graph&&) noexcept = delete;
+
+    ~Graph() = default;
+
     std::vector<double> findRupturePoints(int, double, double) const;
 
 private:
@@ -36,8 +44,6 @@ private:
     };
 
 public:
-
-    Graph() = default;
 
     static std::shared_ptr<Graph> getGraph();
 
